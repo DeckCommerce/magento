@@ -16,4 +16,10 @@
     <event name="cybersource_order_submit_after">
         <observer name="deck_order_cybersource_order_submit_after" instance="DeckCommerce\Integration\Observer\AfterOrderSubmit"/>
     </event>
+    <event name="amazon_pay_place_order_success">
+        <observer name="deck_order_amazon_pay_place_order_success" instance="DeckCommerce\Integration\Observer\AfterOrderSubmit"/>
+    </event>
+    <event name="affirm_place_order_success">
+        <observer name="deck_order_affirm_place_order_success" instance="DeckCommerce\Integration\Observer\AfterOrderSubmit"/>
+    </event>
 </config>

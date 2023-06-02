@@ -295,7 +295,38 @@
                     </depends>
                     <comment>Frequency of automatic orders export. Allows to export already placed orders independently from checkout process. Used if "Send Order Immediately" setting is disabled.</comment>
                 </field>
-                <field id="debug" translate="label" type="select" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="use_payment_methods_mapping" translate="label" type="select" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Use Payment Methods Mapping</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                </field>
+                <field id="payment_methods_mapping" translate="label" type="textarea" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Payment Methods Mapping JSON</label>
+                    <backend_model>DeckCommerce\Integration\Model\Config\Backend\PaymentMethodsMapping</backend_model>
+                    <depends>
+                        <field id="use_payment_methods_mapping">1</field>
+                    </depends>
+                    <comment><![CDATA[ Allows to specify custom mapping for payment methods. Example:
+    {
+        "cybersource": {
+            "PaymentProcessorSubTypeName": "CreditCard",
+            "Generic1": "CreditCard",
+            "Generic2": "@payment_token",
+            "Generic4": "config:general/store_information/name"
+        },
+        "amazonpay": {
+            "PaymentProcessorSubTypeName": "AmazonPay",
+            "Generic1": "Amazon Pay",
+            "Generic2": "payment:additional_info:charge_permission_id",
+            "CapturedAmount": "order:total_paid"
+        }
+    }
+    ]]>
+                    </comment>
+                </field>
+                <field id="debug" translate="label" type="select" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Debug Mode</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <depends>

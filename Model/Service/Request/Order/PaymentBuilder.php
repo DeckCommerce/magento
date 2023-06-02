@@ -7,7 +7,6 @@
 
 namespace DeckCommerce\Integration\Model\Service\Request\Order;
 
-use Amazon\Payment\Gateway\Config\Config as AmazonPayment;
 use DeckCommerce\Integration\Helper\Data as DeckHelper;
 use Magento\OfflinePayments\Model\Banktransfer;
 use Magento\OfflinePayments\Model\Cashondelivery;
@@ -26,6 +25,13 @@ class PaymentBuilder
 
     const PAYMENT_PROCESSOR_STORE_CREDIT  = 'Cash';
     const PAYMENT_PROCESSOR_REWARD_POINTS = 'Loyalty';
+
+    const MAPPING_ORDER_FIELD_PREFIX             = 'order:';
+    const MAPPING_PAYMENT_ADDITIONAL_INFO_PREFIX = 'payment:additional_info:';
+    const MAPPING_PAYMENT_FIELD_PREFIX           = 'payment:';
+    const MAPPING_CONFIG_FIELD_PREFIX            = 'config:';
+
+    const MAPPING_VARIABLE_TOKEN = '@payment_token';
 
     /**
      * CC cards mapping
@@ -114,7 +120,7 @@ class PaymentBuilder
         $orderPayment = $order->getPayment();
 
         $data = [];
-        if ($orderPayment->getAmountAuthorized() > 0) {
+        if ($orderPayment->getAmountAuthorized() > 0 || $orderPayment->getAmountPaid() > 0) {
             $data[] = $this->getMainOrderPayment($orderPayment);
         }
 
@@ -147,7 +153,7 @@ class PaymentBuilder
             "AuthorizedAmount"            => $this->helper->formatPrice($this->getAuthorizedAmount($orderPayment)),
         ];
 
-        if ($orderPayment->getMethod() == AmazonPayment::CODE) {
+        if ($orderPayment->getMethod() === 'amazon_payment') {
             $data["Generic2"] = $this->getAmazonOrderReferenceId($orderPayment);
             $data["Generic3"] = "";
         } elseif ($orderPayment->getMethod() == Free::PAYMENT_METHOD_FREE_CODE) {
@@ -163,7 +169,133 @@ class PaymentBuilder
 
         $data["OrderTransactions"] = $this->getOrderTransactions($orderPayment);
 
+        $data = $this->applyPaymentMethodsMapping($orderPayment, $data);
+
         return $data;
+    }
+
+    /**
+     * Override payment method values by the values specified in the configuration json
+     *
+     * @param OrderPaymentInterface $orderPayment
+     * @param array $defaultMappingData
+     * @return array
+     */
+    protected function applyPaymentMethodsMapping($orderPayment, $defaultMappingData)
+    {
+        $paymentMethodsMapping = $this->helper->getPaymentMethodsMapping();
+        if ($paymentMethodsMapping && isset($paymentMethodsMapping[$orderPayment->getMethod()])) {
+
+            $order = $orderPayment->getOrder();
+            $paymentMethodsMappingFields = $paymentMethodsMapping[$orderPayment->getMethod()];
+            foreach ($paymentMethodsMappingFields as $mappingFieldName => $mappingFieldValue) {
+                if (is_array($mappingFieldValue)) {
+                    continue;
+                }
+
+                $orderFieldValue = $this->processObjectTypeField(
+                    $order, self::MAPPING_ORDER_FIELD_PREFIX, $mappingFieldValue
+                );
+                if (!is_null($orderFieldValue)) {
+                    $defaultMappingData[$mappingFieldName] = $orderFieldValue;
+                    continue;
+                }
+
+                $paymentAdditionalInfoValue = $this->processObjectTypeField(
+                    $orderPayment, self::MAPPING_PAYMENT_ADDITIONAL_INFO_PREFIX, $mappingFieldValue
+                );
+                if (!is_null($paymentAdditionalInfoValue)) {
+                    $defaultMappingData[$mappingFieldName] = $paymentAdditionalInfoValue;
+                    continue;
+                }
+
+                $paymentFieldValue = $this->processObjectTypeField(
+                    $orderPayment, self::MAPPING_PAYMENT_FIELD_PREFIX, $mappingFieldValue
+                );
+                if (!is_null($paymentFieldValue)) {
+                    $defaultMappingData[$mappingFieldName] = $paymentFieldValue;
+                    continue;
+                }
+
+                $configValue = $this->processConfigField($mappingFieldValue);
+                if (!is_null($configValue)) {
+                    $defaultMappingData[$mappingFieldName] = $configValue;
+                    continue;
+                }
+                $customVariableValue = $this->processCustomMappingVariables($orderPayment, $mappingFieldValue);
+                if (!is_null($customVariableValue)) {
+                    $defaultMappingData[$mappingFieldName] = $customVariableValue;
+                    continue;
+                }
+
+                $defaultMappingData[$mappingFieldName] = $mappingFieldValue;
+            }
+        }
+
+        return $defaultMappingData;
+    }
+
+    /**
+     * Process dynamic values with prefix "order:" or "payment:"
+     * Method replaces values like "order:increment_id" with the actual values of specified order or payment by the field
+     *
+     * @param OrderInterface | OrderPaymentInterface $object
+     * @param string $mappingFieldPrefix
+     * @param string $mappingFieldValue
+     * @return string | null
+     */
+    protected function processObjectTypeField($object, $mappingFieldPrefix, $mappingFieldValue)
+    {
+        if (strpos($mappingFieldValue, $mappingFieldPrefix) !== false) {
+            $objectFieldName  = str_replace($mappingFieldPrefix, '', $mappingFieldValue);
+
+            if ($mappingFieldPrefix === self::MAPPING_PAYMENT_ADDITIONAL_INFO_PREFIX) {
+                return (string) $object->getAdditionalInformation($objectFieldName);
+            }
+
+            $objectFieldValue = $object->getData($objectFieldName);
+            if (is_numeric($objectFieldValue) && strpos($objectFieldValue, '.') !== false) {
+                return (string) $this->helper->formatPrice($objectFieldValue);
+            }
+
+            return (string) $objectFieldValue;
+        }
+
+        return null;
+    }
+
+    /**
+     * Process dynamic values with prefix "config:"
+     * Method replaces values like "config:general/store_information/name" with the actual values of system configuration by path
+     *
+     * @param string $mappingFieldValue
+     * @return string | null
+     */
+    protected function processConfigField($mappingFieldValue)
+    {
+        if (strpos($mappingFieldValue, self::MAPPING_CONFIG_FIELD_PREFIX) !== false) {
+            $configPath = str_replace(self::MAPPING_CONFIG_FIELD_PREFIX, '', $mappingFieldValue);
+            return (string) $this->helper->getConfigValue($configPath);
+        }
+
+        return null;
+    }
+
+    /**
+     * Process dynamic custom variables values
+     * Available variable: "@payment_token"
+     *
+     * @param $payment
+     * @param $mappingFieldValue
+     * @return string | null
+     */
+    protected function processCustomMappingVariables($payment, $mappingFieldValue)
+    {
+        if (strpos($mappingFieldValue, self::MAPPING_VARIABLE_TOKEN) !== false) {
+            return (string) $this->getPaymentToken($payment);
+        }
+
+        return null;
     }
 
     /**
@@ -233,7 +365,7 @@ class PaymentBuilder
             case Cashondelivery::PAYMENT_METHOD_CASHONDELIVERY_CODE:
                 $paymentTypeName = 'Cash';
                 break;
-            case AmazonPayment::CODE:
+            case 'amazon_payment':
                 $paymentTypeName = 'AmazonPay';
                 break;
             case Purchaseorder::PAYMENT_METHOD_PURCHASEORDER_CODE:
@@ -265,10 +397,29 @@ class PaymentBuilder
                 $paymentTypeName = 'PayPal';
                 break;
             default:
-                $paymentTypeName = $this->getPaymentMethod($orderPayment);
+                $paymentTypeName = $this->getPaymentMethodTitle($orderPayment);
         }
 
         return $paymentTypeName;
+    }
+
+    /**
+     * Get payment method title name
+     *
+     * @param OrderPaymentInterface $orderPayment
+     * @return string
+     */
+    protected function getPaymentMethodTitle(OrderPaymentInterface $orderPayment)
+    {
+        $additionalInformation = $orderPayment->getAdditionalInformation();
+        if (is_array($additionalInformation)
+            && isset($additionalInformation['method_title'])
+            && $additionalInformation['method_title']
+        ) {
+            return $additionalInformation['method_title'];
+        }
+
+        return $orderPayment->getMethod();
     }
 
     /**
@@ -283,15 +434,7 @@ class PaymentBuilder
             return $this->supportedCcTypes[$orderPayment->getCcType()] ?? $orderPayment->getCcType();
         }
 
-        $additionalInformation = $orderPayment->getAdditionalInformation();
-        if (is_array($additionalInformation)
-            && isset($additionalInformation['method_title'])
-            && $additionalInformation['method_title']
-        ) {
-            return $additionalInformation['method_title'];
-        }
-
-        return $orderPayment->getMethod();
+        return $this->getPaymentMethodTitle($orderPayment);
     }
 
     /**

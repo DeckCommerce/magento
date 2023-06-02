@@ -42,12 +42,14 @@ class Config extends AbstractHelper
     const INVENTORY_IMPORT_HISTORY_DIRECTORY  = 'deck_commerce_inventory/%s_inventory_import/history_directory';
     const INVENTORY_IMPORT_LOGS_LIFETIME      = 'deck_commerce_inventory/%s_inventory_import/logs_lifetime';
 
-    const ORDER_ENABLED              = 'deck_commerce_sales/order/enabled';
-    const ORDER_API_NAME             = 'deck_commerce_sales/order/api_name';
-    const ORDER_DEFAULT_METHOD       = 'deck_commerce_sales/order/default_method';
-    const ORDER_UPC_ATTRIBUTE_CODE   = 'deck_commerce_sales/order/upc_attribute';
-    const ORDER_SEND_IMMEDIATELY     = 'deck_commerce_sales/order/send_immediately';
-    const ORDER_DEBUG                = 'deck_commerce_sales/order/debug';
+    const ORDER_ENABLED                     = 'deck_commerce_sales/order/enabled';
+    const ORDER_API_NAME                    = 'deck_commerce_sales/order/api_name';
+    const ORDER_DEFAULT_METHOD              = 'deck_commerce_sales/order/default_method';
+    const ORDER_UPC_ATTRIBUTE_CODE          = 'deck_commerce_sales/order/upc_attribute';
+    const ORDER_SEND_IMMEDIATELY            = 'deck_commerce_sales/order/send_immediately';
+    const ORDER_USE_PAYMENT_METHODS_MAPPING = 'deck_commerce_sales/order/use_payment_methods_mapping';
+    const ORDER_PAYMENT_METHODS_MAPPING     = 'deck_commerce_sales/order/payment_methods_mapping';
+    const ORDER_DEBUG                       = 'deck_commerce_sales/order/debug';
 
     const ORDER_HISTORY_ENABLED        = 'deck_commerce_sales/order_history/enabled';
     const ORDER_HISTORY_API_NAME       = 'deck_commerce_sales/order_history/api_name';
@@ -95,6 +97,17 @@ class Config extends AbstractHelper
     }
 
     /**
+     * Get config value
+     *
+     * @param string $path
+     * @param string $scopeType
+     */
+    public function getConfigValue($path, $scopeType = ScopeInterface::SCOPE_STORE)
+    {
+        return $this->scopeConfig->getValue($path, $scopeType);
+    }
+
+    /**
      * Get Deck Commerce site code setting
      *
      * @param string $scopeType
@@ -102,7 +115,7 @@ class Config extends AbstractHelper
      */
     public function getSiteCode($scopeType = ScopeInterface::SCOPE_STORE)
     {
-        return $this->scopeConfig->getValue(self::CONFIG_SITE_CODE, $scopeType);
+        return $this->getConfigValue(self::CONFIG_SITE_CODE, $scopeType);
     }
 
     /**
@@ -113,7 +126,7 @@ class Config extends AbstractHelper
      */
     public function getWebApiUrl($scopeType = ScopeInterface::SCOPE_STORE)
     {
-        return rtrim($this->scopeConfig->getValue(self::CONFIG_WEB_API_URL, $scopeType), '/');
+        return rtrim($this->getConfigValue(self::CONFIG_WEB_API_URL, $scopeType), '/');
     }
 
     /**
@@ -124,7 +137,7 @@ class Config extends AbstractHelper
      */
     public function getSiteApiKey($scopeType = ScopeInterface::SCOPE_STORE)
     {
-        $value = $this->scopeConfig->getValue(self::CONFIG_SITE_API_KEY, $scopeType);
+        $value = $this->getConfigValue(self::CONFIG_SITE_API_KEY, $scopeType);
         return $this->encryptor->decrypt($value);
     }
 
@@ -136,7 +149,7 @@ class Config extends AbstractHelper
      */
     public function getInventoryCheckApiName($scopeType = ScopeInterface::SCOPE_STORE)
     {
-        return $this->scopeConfig->getValue(self::INVENTORY_API_NAME, $scopeType);
+        return $this->getConfigValue(self::INVENTORY_API_NAME, $scopeType);
     }
 
     /**
@@ -203,7 +216,7 @@ class Config extends AbstractHelper
      */
     public function getInventoryFeedName($scopeType = ScopeInterface::SCOPE_STORE)
     {
-        return $this->scopeConfig->getValue(
+        return $this->getConfigValue(
             self::INVENTORY_FEED_NAME,
             $scopeType
         );
@@ -219,7 +232,7 @@ class Config extends AbstractHelper
      */
     public function getInventoryCacheLifetime($scopeType = ScopeInterface::SCOPE_STORE)
     {
-        return $this->scopeConfig->getValue(
+        return $this->getConfigValue(
             self::INVENTORY_CHECK_CACHE_LIFETIME,
             $scopeType
         );
@@ -258,7 +271,7 @@ class Config extends AbstractHelper
      */
     public function getOrderExportApiName($scopeType = ScopeInterface::SCOPE_STORE)
     {
-        return $this->scopeConfig->getValue(self::ORDER_API_NAME, $scopeType);
+        return $this->getConfigValue(self::ORDER_API_NAME, $scopeType);
     }
 
     /**
@@ -273,7 +286,7 @@ class Config extends AbstractHelper
     public function getDefaultShippingMethod($scopeType = ScopeInterface::SCOPE_STORE)
     {
         return
-            $this->scopeConfig->getValue(self::ORDER_DEFAULT_METHOD, $scopeType)
+            $this->getConfigValue(self::ORDER_DEFAULT_METHOD, $scopeType)
             ?: self::DEFAULT_DECK_SHIPPING_METHOD;
     }
 
@@ -285,7 +298,7 @@ class Config extends AbstractHelper
      */
     public function getOrderItemUpcAttribute($scopeType = ScopeInterface::SCOPE_STORE)
     {
-        return $this->scopeConfig->getValue(self::ORDER_UPC_ATTRIBUTE_CODE, $scopeType);
+        return $this->getConfigValue(self::ORDER_UPC_ATTRIBUTE_CODE, $scopeType);
     }
 
     /**
@@ -300,6 +313,32 @@ class Config extends AbstractHelper
             self::ORDER_SEND_IMMEDIATELY,
             $scopeType
         );
+    }
+
+    /**
+     * Setting that determines if need to use payment methods mapping
+     *
+     * @param string $scopeType
+     * @return bool
+     */
+    public function usePaymentMethodsMappingJson($scopeType = ScopeInterface::SCOPE_STORE)
+    {
+        return $this->scopeConfig->isSetFlag(self::ORDER_USE_PAYMENT_METHODS_MAPPING, $scopeType);
+    }
+
+    /**
+     * Get order payment methods mapping json
+     *
+     * @param string $scopeType
+     * @return bool
+     */
+    public function getPaymentMethodsMappingJson($scopeType = ScopeInterface::SCOPE_STORE)
+    {
+        if (!$this->usePaymentMethodsMappingJson($scopeType)) {
+            return '';
+        }
+
+        return trim($this->getConfigValue(self::ORDER_PAYMENT_METHODS_MAPPING, $scopeType));
     }
 
     /**
@@ -338,7 +377,7 @@ class Config extends AbstractHelper
      */
     public function getOrderHistoryApiName($scopeType = ScopeInterface::SCOPE_STORE)
     {
-        return $this->scopeConfig->getValue(self::ORDER_HISTORY_API_NAME, $scopeType);
+        return $this->getConfigValue(self::ORDER_HISTORY_API_NAME, $scopeType);
     }
 
     /**
@@ -351,7 +390,7 @@ class Config extends AbstractHelper
      */
     public function getOrderHistoryCacheLifetime($scopeType = ScopeInterface::SCOPE_STORE)
     {
-        return $this->scopeConfig->getValue(
+        return $this->getConfigValue(
             self::ORDER_HISTORY_CACHE_LIFETIME,
             $scopeType
         );
@@ -395,7 +434,7 @@ class Config extends AbstractHelper
      */
     public function getInventorySourceFilePrefix($inventoryType, $scopeType = ScopeInterface::SCOPE_STORE)
     {
-        return $this->scopeConfig->getValue(
+        return $this->getConfigValue(
             sprintf(self::INVENTORY_IMPORT_SOURCE_FILE_PREFIX, $inventoryType),
             $scopeType
         );
@@ -410,7 +449,7 @@ class Config extends AbstractHelper
      */
     public function getInventorySftpDirectory($inventoryType, $scopeType = ScopeInterface::SCOPE_STORE)
     {
-        return $this->scopeConfig->getValue(
+        return $this->getConfigValue(
             sprintf(self::INVENTORY_IMPORT_SFTP_DIR, $inventoryType),
             $scopeType
         );
@@ -425,7 +464,7 @@ class Config extends AbstractHelper
      */
     public function getInventorySftpHost($inventoryType, $scopeType = ScopeInterface::SCOPE_STORE)
     {
-        return $this->scopeConfig->getValue(
+        return $this->getConfigValue(
             sprintf(self::INVENTORY_IMPORT_SFTP_HOST, $inventoryType),
             $scopeType
         );
@@ -440,7 +479,7 @@ class Config extends AbstractHelper
      */
     public function getInventorySftpUsername($inventoryType, $scopeType = ScopeInterface::SCOPE_STORE)
     {
-        return $this->scopeConfig->getValue(
+        return $this->getConfigValue(
             sprintf(self::INVENTORY_IMPORT_SFTP_USERNAME, $inventoryType),
             $scopeType
         );
@@ -455,7 +494,7 @@ class Config extends AbstractHelper
      */
     public function getInventorySftpPassword($inventoryType, $scopeType = ScopeInterface::SCOPE_STORE)
     {
-        $value = $this->scopeConfig->getValue(
+        $value = $this->getConfigValue(
             sprintf(self::INVENTORY_IMPORT_SFTP_PASSWORD, $inventoryType),
             $scopeType
         );
@@ -472,7 +511,7 @@ class Config extends AbstractHelper
      */
     public function getInventoryHistoryDirectory($inventoryType, $scopeType = ScopeInterface::SCOPE_STORE)
     {
-        return rtrim($this->scopeConfig->getValue(
+        return rtrim($this->getConfigValue(
             sprintf(self::INVENTORY_IMPORT_HISTORY_DIRECTORY, $inventoryType),
             $scopeType
         ), '/');
@@ -487,7 +526,7 @@ class Config extends AbstractHelper
      */
     public function getInventoryLogsLifetime($inventoryType, $scopeType = ScopeInterface::SCOPE_STORE)
     {
-        return rtrim($this->scopeConfig->getValue(
+        return rtrim($this->getConfigValue(
             sprintf(self::INVENTORY_IMPORT_LOGS_LIFETIME, $inventoryType),
             $scopeType
         ), '/');
@@ -515,7 +554,7 @@ class Config extends AbstractHelper
      */
     public function getRmaExportApiName($scopeType = ScopeInterface::SCOPE_STORE)
     {
-        return $this->scopeConfig->getValue(self::RMA_API_NAME, $scopeType);
+        return $this->getConfigValue(self::RMA_API_NAME, $scopeType);
     }
 
     /**
@@ -526,7 +565,7 @@ class Config extends AbstractHelper
      */
     public function getDefaultRmaType($scopeType = ScopeInterface::SCOPE_STORE)
     {
-        return $this->scopeConfig->getValue(self::RMA_DEFAULT_TYPE, $scopeType);
+        return $this->getConfigValue(self::RMA_DEFAULT_TYPE, $scopeType);
     }
 
     /**

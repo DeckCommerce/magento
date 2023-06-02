@@ -13,5 +13,9 @@
                 type="DeckCommerce\Integration\Controller\Sales\Order\Reorder" />
     <preference for="Magento\Sales\Helper\Guest"
                 type="DeckCommerce\Integration\Helper\Sales\Guest" />
-    <preference for="Magento\Sales\Helper\Reorder" type="DeckCommerce\Integration\Helper\Sales\Reorder" />
+    <preference for="Magento\Sales\Helper\Reorder"
+                type="DeckCommerce\Integration\Helper\Sales\Reorder" />
+    <type name="Magento\Sales\Block\Adminhtml\Order\View">
+        <plugin name="deck_order_buttons" type="DeckCommerce\Integration\Plugin\Block\Sales\Adminhtml\Order\ViewPlugin" />
+    </type>
 </config>

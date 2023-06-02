@@ -150,12 +150,12 @@ class ItemBuilder
         }
 
         if (empty($result)) {
-            $size = $product->getAttributeText('size');
+            $size = $this->getAttributeText($product, 'size');
             if ($size) {
                 $result["Custom{$customNumber}"] = sprintf('%s: %s', 'Size', $size);
                 $customNumber++;
             }
-            $color = $product->getAttributeText('color');
+            $color = $this->getAttributeText($product, 'color');
             if ($color) {
                 $result["Custom{$customNumber}"] = sprintf('%s: %s', 'Color', $color);
             }
@@ -201,6 +201,22 @@ class ItemBuilder
     }
 
     /**
+     * Get product attribute option value
+     *
+     * @param Product $product
+     * @param string $attributeCode
+     * @return string
+     */
+    protected function getAttributeText($product, $attributeCode)
+    {
+        if ($product->getData($attributeCode)) {
+            return $product->getAttributeText($attributeCode);
+        }
+
+        return '';
+    }
+
+    /**
      * Prepare order items, split by quantity.
      * Each item has quantity = 1
      *
@@ -225,7 +241,7 @@ class ItemBuilder
             "ImageURL"            => $this->getImageUrl($product),
             "MSRP"                => $this->getMsrp($product),
             "StyleNumber"         => $productName,
-            "ProductSize"         => $product->getAttributeText('size') ?: "",
+            "ProductSize"         => $this->getAttributeText($product, 'size'),
             "GiftMessage"         => $this->getGiftMessage($orderItem),
             "UnlimitedBackorder"  => $this->canBackorder($orderItem),
             "ShippingReferenceID" => 0,

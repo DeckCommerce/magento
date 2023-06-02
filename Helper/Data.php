@@ -714,4 +714,35 @@ class Data extends Config
     {
         return $this->_moduleManager->isEnabled('Magento_Rma');
     }
+
+    /**
+     * Get json unserialized order payment methods mapping
+     *
+     * @param string $scopeType
+     * @return []
+     */
+    public function getPaymentMethodsMapping($scopeType = ScopeInterface::SCOPE_STORE)
+    {
+        $mappingJson = $this->getPaymentMethodsMappingJson($scopeType);
+        if ($mappingJson) {
+            $mapping = $this->jsonDecode($mappingJson);
+            if (is_array($mapping)) {
+                return $mapping;
+            }
+        }
+
+        return [];
+    }
+
+    /**
+     * Get DeckCommerce application order URL by the Magento order increment ID
+     *
+     * @param string $orderIncrementId
+     * @return string
+     */
+    public function getDeckCommerceOrderUrl($orderIncrementId)
+    {
+        $apiUrl = $this->getWebApiUrl();
+        return str_replace('api', 'app', $apiUrl) . '/OMS/' . $orderIncrementId;
+    }
 }
