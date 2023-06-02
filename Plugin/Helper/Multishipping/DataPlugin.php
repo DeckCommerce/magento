@@ -41,9 +41,9 @@ class DataPlugin
      */
     public function afterIsMultishippingCheckoutAvailable(MultishippingHelper $subject, $result)
     {
-        if ($this->helper->isEnabled()) {
+        /*if ($this->helper->isEnabled()) {
             return false;
-        }
+        }*/
 
         return $result;
     }
