@@ -11,13 +11,13 @@ use DeckCommerce\Integration\Helper\Data as HelperData;
 use DeckCommerce\Integration\Model\Service\Exception\WebapiException;
 use DeckCommerce\Integration\Model\Service\Response\Handler as ResponseHandler;
 use DeckCommerce\Integration\Model\Service\Response\Validator as ResponseValidator;
-use Magento\Framework\HTTP\LaminasClient;
-use Magento\Framework\HTTP\LaminasClientFactory;
+use Laminas\Http\Client as LaminasClient;
+use Laminas\Http\ClientFactory as LaminasClientFactory;
+use Laminas\Http\Client\Adapter\Curl;
+use Laminas\Http\Response;
 use Magento\Framework\Serialize\Serializer\Json;
 use Magento\Framework\Webapi\Rest\Request;
 use Magento\Store\Model\ScopeInterface;
-use Laminas\Http\Response;
-use Laminas\Http\Client\Adapter\Curl;
 
 /**
  * API Http Client
