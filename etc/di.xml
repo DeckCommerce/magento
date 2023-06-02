@@ -1,0 +1,104 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @author DeckCommerce Team
+ * @copyright Copyright (c) 2020 DeckCommerce (https://www.deckcommerce.com)
+ * @package DeckCommerce_Integration
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+
+    <preference for="DeckCommerce\Integration\Model\Service\Request\OrderBuilderInterface"
+                type="DeckCommerce\Integration\Model\Service\Request\OrderBuilder" />
+    <preference for="DeckCommerce\Integration\Model\Service\Request\RmaBuilderInterface"
+                type="DeckCommerce\Integration\Model\Service\Request\RmaBuilder" />
+    <preference for="DeckCommerce\Integration\Model\Service\Request\InventoryCheckBuilderInterface"
+                type="DeckCommerce\Integration\Model\Service\Request\InventoryCheckBuilder" />
+    <preference for="DeckCommerce\Integration\Model\Service\Request\OrderHistoryInterface"
+                type="DeckCommerce\Integration\Model\Service\Request\OrderHistory" />
+    <preference for="DeckCommerce\Integration\Model\Service\Response\HandlerInterface"
+                type="DeckCommerce\Integration\Model\Service\Response\Handler" />
+    <preference for="DeckCommerce\Integration\Model\Service\Response\ValidatorInterface"
+                type="DeckCommerce\Integration\Model\Service\Response\Validator" />
+    <type name="Magento\CatalogInventory\Observer\QuantityValidatorObserver">
+        <plugin name="deck_quote_item_qty_validator" type="DeckCommerce\Integration\Plugin\CatalogInventory\Observer\QuantityValidatorObserverPlugin" />
+    </type>
+    <type name="Magento\SalesRule\Model\RulesApplier">
+        <plugin name="deck_sales_rules_applier" type="DeckCommerce\Integration\Plugin\Model\SalesRule\RulesApplierPlugin" />
+    </type>
+    <type name="Magento\InventoryReservationsApi\Model\AppendReservationsInterface">
+        <plugin name="deck_disable_inventory_reservations" type="DeckCommerce\Integration\Plugin\Model\InventoryReservations\AppendReservationsPlugin"/>
+    </type>
+    <type name="Magento\Multishipping\Helper\Data">
+        <plugin name="deck_multishipping_helper_data" type="DeckCommerce\Integration\Plugin\Helper\Multishipping\DataPlugin" />
+    </type>
+    <type name="Magento\Config\Model\Config\TypePool">
+        <arguments>
+            <argument name="sensitive" xsi:type="array">
+                <item name="deck_commerce_integration/general/site_api_key" xsi:type="string">1</item>
+            </argument>
+            <argument name="environment" xsi:type="array">
+                <item name="deck_commerce_integration/general/site_api_key" xsi:type="string">1</item>
+            </argument>
+        </arguments>
+    </type>
+    <virtualType name="Magento\Sales\Model\ResourceModel\Order\Grid" type="Magento\Sales\Model\ResourceModel\Grid">
+        <arguments>
+            <argument name="columns" xsi:type="array">
+                <item name="deck_export_status" xsi:type="string">sales_order.deck_export_status</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <type name="DeckCommerce\Integration\Logger\Handler">
+        <arguments>
+            <argument name="filesystem" xsi:type="object">Magento\Framework\Filesystem\Driver\File</argument>
+        </arguments>
+    </type>
+    <type name="DeckCommerce\Integration\Logger\Logger">
+        <arguments>
+            <argument name="name" xsi:type="string">deckLogger</argument>
+            <argument name="handlers"  xsi:type="array">
+                <item name="system" xsi:type="object">DeckCommerce\Integration\Logger\Handler</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+        <arguments>
+            <argument name="collections" xsi:type="array">
+                <item name="deck_shipping_method_listing_data_source" xsi:type="string">DeckCommerce\Integration\Model\ResourceModel\DeckMethod\Grid\Collection</item>
+            </argument>
+        </arguments>
+    </type>
+    <virtualType name="DeckCommerce\Integration\Model\ResourceModel\DeckMethod\Grid\Collection" type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">deck_shipping_method</argument>
+            <argument name="resourceModel" xsi:type="string">DeckCommerce\Integration\Model\ResourceModel\DeckMethod</argument>
+        </arguments>
+    </virtualType>
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+        <arguments>
+            <argument name="collections" xsi:type="array">
+                <item name="deck_shipping_map_listing_data_source" xsi:type="string">DeckCommerce\Integration\Model\ResourceModel\MethodMap\Grid\Collection</item>
+            </argument>
+        </arguments>
+    </type>
+    <virtualType name="DeckCommerce\Integration\Model\ResourceModel\MethodMap\Grid\Collection" type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">deck_shipping_method_map</argument>
+            <argument name="resourceModel" xsi:type="string">DeckCommerce\Integration\Model\ResourceModel\MethodMap</argument>
+        </arguments>
+    </virtualType>
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+        <arguments>
+            <argument name="collections" xsi:type="array">
+                <item name="deck_inventory_log_listing_data_source" xsi:type="string">DeckCommerce\Integration\Model\ResourceModel\InventoryLog\Grid\Collection</item>
+            </argument>
+        </arguments>
+    </type>
+    <virtualType name="DeckCommerce\Integration\Model\ResourceModel\InventoryLog\Grid\Collection" type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">deck_inventory_log</argument>
+            <argument name="resourceModel" xsi:type="string">DeckCommerce\Integration\Model\ResourceModel\InventoryLog</argument>
+        </arguments>
+    </virtualType>
+</config>

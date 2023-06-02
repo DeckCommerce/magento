@@ -1,0 +1,194 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+/** @var $block \Magento\Rma\Block\Returns\View */
+/** @var \Magento\Framework\View\Helper\SecureHtmlRenderer $secureRenderer */
+?>
+
+<?php
+    $_rma = $block->getRma();
+    $_order = $block->getOrder();
+    $additionalData = $block->getAdditionalData();
+    $rmaHelper = $block->getRmaHelper();
+    $isAvailableForCancel = $_rma->getStatus() == 'Pending';
+?>
+
+<div class="block block-return-details">
+    <div class="block-content">
+        <div class="box box-returns-requested">
+            <strong class="box-title"><span><?= $block->escapeHtml(__('Request Information')); ?></span></strong>
+            <div class="box-content">
+                <?= $block->escapeHtml(__('ID')); ?>: <?= $block->escapeHtml($_rma->getIncrementId()) ?><br>
+                <?= $block->escapeHtml(__('Order ID')); ?>:
+                <a href="<?= $block->escapeUrl($block->getOrderUrl($_rma)); ?>">
+                    <?= $block->escapeHtml($_rma->getOrderIncrementId()) ?>
+                </a>
+                <br>
+                <?= $block->escapeHtml(__('Date Requested')); ?>:
+                <?= $block->escapeHtml($rmaHelper->getFormatedDate($_rma->getDateRequested())); ?><br>
+                <?= $block->escapeHtml(__('Email')); ?>: <?= $block->escapeHtml($_order->getCustomerEmail()) ?>
+                <?php if ($_rma->getCustomerCustomEmail()): ?>
+                    <br>
+                    <?= $block->escapeHtml(__('Contact Email Address')); ?>:
+                    <?= $block->escapeHtml($_rma->getCustomerCustomEmail()) ?>
+                <?php endif ?>
+            </div>
+        </div>
+        <div class="box box-treturns-shipping">
+            <strong class="box-title"><span><?= $block->escapeHtml(__('Shipping Address')); ?></span></strong>
+            <div class="box-content">
+                <address>
+                    <?= /* @noEscape */ $block->getAddress() ?>
+                </address>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="returns-details-items">
+    <span id="rma-please-wait"
+          class="please-wait load indicator"
+          data-text="<?= $block->escapeHtml(__('This won\'t take long . . .')); ?>">
+        <span><?= $block->escapeHtml(__('This won\'t take long . . .')); ?></span>
+    </span>
+    <?= /* @noEscape */ $secureRenderer->renderTag(
+        'style',
+        [],
+        '#rma-please-wait { display:none; }',
+        false
+    ); ?>
+
+    <div class="block block-returns-items">
+        <div class="block-title">
+            <strong><?= $block->escapeHtml(__('Items Return Requested For')); ?></strong>
+        </div>
+        <div class="block-content">
+            <div class="table-wrapper table-returns">
+                <table class="data table table-returns" id="my-returns-items-table">
+                    <caption class="table-caption">
+                        <?= $block->escapeHtml(__('Items Return Requested For')); ?>
+                    </caption>
+                    <thead>
+                    <tr>
+                        <?php $availableAttributes = $block->getVisibleAttributes(); ?>
+                        <th scope="col" class="col id"><?= $block->escapeHtml(__('Product Name')); ?></th>
+                        <th scope="col" class="col sku"><?= $block->escapeHtml(__('SKU')); ?></th>
+                        <th scope="col" class="col condition"><?= $block->escapeHtml(__('Reason For Return')); ?></th>
+                        <th scope="col" class="col qty"><?= $block->escapeHtml(__('Qty')); ?></th>
+                        <th scope="col" class="col status"><?= $block->escapeHtml(__('Status')); ?></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <?php $_qna = null; ?>
+                    <?php foreach ($block->getItems() as $key => $item): ?>
+                        <?php foreach ($block->getRealValueAttributes($item->getId()) as $code => $attribute) {
+                            if (!in_array($code, $block->getAttributeFilter())
+                                && !empty($attribute['value'])
+                                && $block->getAttributeLabel($item->getId(), $code)
+                                && false !== $block->getAttributeValue($item->getId(), $code)
+                            ) {
+                                $_qna .= '
+                                        <tr><td class="col questions">'
+                                    . $block->getAttributeLabel($item->getId(), $code)
+                                    . '</td><td class="col answers">'
+                                    . $block->getAttributeValue($item->getId(), $code) . '</td></tr>
+                                    ';
+                            }
+                        } ?>
+                        <tr>
+                            <td data-th="<?= $block->escapeHtml(__('Product Name')) ?>" class="col id">
+                                <?= $block->escapeHtml($item->getProductName()) ?>
+                                <?php if ($_options = $block->getItemOptions($item)): ?>
+                                    <dl class="item options">
+                                        <?php foreach ($_options as $_option): ?>
+                                            <dt><?= $block->escapeHtml($_option['label']); ?></dt>
+                                            <dd><?= $block->escapeHtml($_option['value']); ?></dd>
+                                        <?php endforeach; ?>
+                                    </dl>
+                                <?php endif; ?>
+                                <?php if ($_qna): ?>
+                                    <button class="action details"
+                                            type="button"
+                                            data-mage-init='{
+                                                "toggleAdvanced": {
+                                                    "newLabel": "<?= $block->escapeHtml(__('Hide Details')); ?>",
+                                                    "toggleContainers": "#shf_<?= $block->escapeHtml($key); ?>"
+                                                }}'>
+                                        <span><?= $block->escapeHtml(__('Show Details')); ?></span>
+                                    </button>
+                                <?php endif; ?>
+                            </td>
+                            <td data-th="<?= $block->escapeHtml(__('SKU')) ?>" class="col sku">
+                                <?= $block->escapeHtml($item->getProductSku()) ?>
+                            </td>
+                            <td data-th="<?= $block->escapeHtml(__('Reason For Return')) ?>" class="col sku">
+                                <?= $block->escapeHtml($block->getRmaReasonById($item->getReason())) ?>
+                                <?php if ($item->getReasonText()): ?>
+                                    (<?= $block->escapeHtml($item->getReasonText()) ?>)
+                                <?php endif; ?>
+                            </td>
+                            <td data-th="<?= $block->escapeHtml(__('Qty')) ?>" class="col qty">
+                                <?= $block->escapeHtml($rmaHelper->getQty($item)) ?>
+                            </td>
+                            <td data-th="<?= $block->escapeHtml(__('Status')) ?>" class="col status">
+                                <?= $block->escapeHtml($_rma->getStatusLabel()) ?>
+                            </td>
+                        </tr>
+
+                    <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <?php if ($isAvailableForCancel): ?>
+        <div class="block-cancel">
+            <form method="get"
+                  id="rma_cancel"
+                  action="<?= $block->escapeUrl($block->getCancelUrl()); ?>"
+                  class="form form-returns-comments"
+                  data-mage-init='{"validation":{}}'>
+                <fieldset class="fieldset">
+                    <div class="actions-toolbar">
+                        <div class="primary">
+                            <button type="submit" class="action submit primary" id="button_cancel_rma">
+                                <span><?= $block->escapeHtml(__('Cancel RMA')); ?></span>
+                            </button>
+                        </div>
+                    </div>
+                </fieldset>
+            </form>
+        </div>
+    <?php endif ?>
+</div>
+
+<?php if ($isAvailableForCancel): ?>
+<?php $scriptString = <<<script
+require([
+        'jquery',
+        'Magento_Ui/js/modal/confirm'
+        ],
+        function($, confirmation) {
+        $('#button_cancel_rma').on('click', function (e){
+            e.preventDefault();
+            confirmation({
+                title: 'Cancel RMA',
+                content: 'Do you want to cancel RMA?',
+                actions: {
+                    confirm: function () {
+                        $('#rma_cancel').submit();
+                    },
+                    cancel: function () {
+                        return false;
+                    }
+                }
+            });
+        });
+    });
+script;
+?>
+<?= /* @noEscape */ $secureRenderer->renderTag('script', [], $scriptString, false) ?>
+<?php endif ?>

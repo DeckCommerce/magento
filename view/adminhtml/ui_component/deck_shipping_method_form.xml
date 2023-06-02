@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * @author DeckCommerce Team
+ * @copyright Copyright (c) 2020 DeckCommerce (https://www.deckcommerce.com)
+ * @package DeckCommerce_Integration
+ */
+-->
+<form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">deck_shipping_method_form.deck_shipping_method_form_data_source</item>
+            <item name="deps" xsi:type="string">deck_shipping_method_form.deck_shipping_method_form_data_source</item>
+        </item>
+        <item name="label" xsi:type="string" translate="true">Deck Commerce Shipping Method</item>
+        <item name="layout" xsi:type="array">
+            <item name="type" xsi:type="string">tabs</item>
+        </item>
+        <item name="buttons" xsi:type="array">
+            <item name="back" xsi:type="string">DeckCommerce\Integration\Block\Adminhtml\Shipping\Method\Edit\BackButton</item>
+            <item name="delete" xsi:type="string">DeckCommerce\Integration\Block\Adminhtml\Shipping\Method\Edit\DeleteButton</item>
+            <item name="save" xsi:type="string">DeckCommerce\Integration\Block\Adminhtml\Shipping\Method\Edit\SaveButton</item>
+        </item>
+    </argument>
+    <dataSource name="deck_shipping_method_form_data_source">
+        <argument name="dataProvider" xsi:type="configurableObject">
+            <argument name="class" xsi:type="string">DeckCommerce\Integration\Ui\Component\DataProvider\ShippingMethodDataProvider</argument>
+            <argument name="name" xsi:type="string">deck_shipping_method_form_data_source</argument>
+            <argument name="primaryFieldName" xsi:type="string">deck_method_id</argument>
+            <argument name="requestFieldName" xsi:type="string">deck_method_id</argument>
+        </argument>
+        <argument name="data" xsi:type="array">
+            <item name="js_config" xsi:type="array">
+                <item name="component" xsi:type="string">Magento_Ui/js/form/provider</item>
+            </item>
+        </argument>
+        <settings>
+            <submitUrl path="deck/shipping_method/save"/>
+        </settings>
+    </dataSource>
+    <fieldset name="method" sortOrder="10">
+        <settings>
+            <label translate="true">Deck Commerce Shipping Method Details</label>
+        </settings>
+        <field name="deck_method_id" formElement="input" sortOrder="10">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">method</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>number</dataType>
+                <visible>false</visible>
+                <dataScope>deck_method_id</dataScope>
+            </settings>
+        </field>
+        <field name="deck_method_name" formElement="input" sortOrder="20">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">method</item>
+                </item>
+            </argument>
+            <settings>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+                <dataType>text</dataType>
+                <dataScope>deck_method_name</dataScope>
+                <label translate="true">Deck Commerce Method Name</label>
+            </settings>
+        </field>
+        <field name="is_enabled" formElement="checkbox" sortOrder="30">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="default" xsi:type="number">1</item>
+                    <item name="source" xsi:type="string">method</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>boolean</dataType>
+                <dataScope>is_enabled</dataScope>
+                <label translate="true">Is Enabled</label>
+            </settings>
+            <formElements>
+                <checkbox>
+                    <settings>
+                        <valueMap>
+                            <map name="false" xsi:type="number">0</map>
+                            <map name="true" xsi:type="number">1</map>
+                        </valueMap>
+                        <prefer>toggle</prefer>
+                    </settings>
+                </checkbox>
+            </formElements>
+        </field>
+    </fieldset>
+</form>

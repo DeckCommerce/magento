@@ -1,0 +1,195 @@
+<?php
+
+/** @var $block \DeckCommerce\Integration\Block\Rma\Create */
+?>
+<?php $_order =  $block->getOrder(); ?>
+<?php $_data = $block->getFormData(); ?>
+<?php $_items = $block->getItems(); ?>
+<?php $_rmaReasons = $block->getReasonsList(); ?>
+
+<form id="rma_create_form" method="post" enctype="multipart/form-data" class="form form-create-return">
+    <?php /*START top-order-info*/ ?>
+    <fieldset class="fieldset top-order-info">
+        <legend class="legend">
+            <span><?= /* @escapeNotVerified */ __('Order # %1', $_order->getIncrementId()) ?></span>
+            <span><?= /* @escapeNotVerified */ __('Order Date: %1', $block->formatDate($_order->getCreatedAt(), \IntlDateFormatter::MEDIUM, true)) ?></span>
+        </legend>
+        <br>
+        <div class="row">
+            <div class="col-xs-12 col-md-4">
+                <div class="field id">
+                    <span class="label"><span><?= /* @escapeNotVerified */ __('Order ID') ?></span></span>
+                    <div class="control"><span><?= /* @escapeNotVerified */ $_order->getIncrementId() ?></span></div>
+                </div>
+                <div class="field email">
+                    <span class="label"><span><?= /* @escapeNotVerified */ __('Email') ?></span></span>
+                    <div class="control"><span><?= /* @escapeNotVerified */ $_order->getCustomerEmail() ?></span></div>
+                </div>
+            </div>
+            <div class="col-xs-12 col-md-4">
+                <div class="field address shipping">
+                    <span class="label"><span><?= /* @escapeNotVerified */ __('Order Shipping Address') ?></span></span>
+                    <address class="control"><?= /* @escapeNotVerified */ $block->format($_order->getShippingAddress(), 'html') ?></address>
+                </div>
+            </div>
+            <div class="col-xs-12 col-md-4">
+                <div class="field name">
+                    <span class="label"><span><?= /* @escapeNotVerified */ __('Customer Name') ?></span></span>
+                    <div class="control"><span><?= $block->escapeHtml($_order->getCustomerName()) ?></span></div>
+                </div>
+            </div>
+        </div>
+
+        <br>
+        <div><?= /* @escapeNotVerified */ __('Unfortunately, not all orders are eligible for online returns.') ?></div>
+        <div><?= /* @escapeNotVerified */ __('Please note that all sales to Canada, Havaii, Alaska, and APO/FPO addresses are final.') ?></div>
+
+    </fieldset>
+    <?php /*END top-order-info*/ ?>
+    <?php /*START returning-items*/ ?>
+    <fieldset class="fieldset returning-items-wrap">
+        <legend class="legend"><span><?= /* @escapeNotVerified */ __('Select Items to Return') ?></span></legend>
+        <br>
+        <div class="returning-items-list">
+
+            <table id="shopping-cart-table"
+                   class="cart items data table"
+                   data-mage-init='{"shoppingCart":{"emptyCartButton": ".action.clear",
+               "updateCartActionContainer": "#update_cart_action_container"}}'>
+                <caption class="table-caption"><?= $block->escapeHtml(__('Shopping Cart Items')) ?></caption>
+                <thead>
+                <tr>
+                    <th class="col name" scope="col"></th>
+                    <th class="col name" scope="col"><span><?= $block->escapeHtml(__('Name')) ?></span></th>
+                    <th class="col sku" scope="col"><span><?= $block->escapeHtml(__('SKU')) ?></span></th>
+                    <th class="col price" scope="col"><span><?= $block->escapeHtml(__('Price')) ?></span></th>
+                    <th class="col reason" scope="col"><span><?= $block->escapeHtml(__('Reason to Return')) ?></span></th>
+                    <th class="col reason" scope="col"><span><?= $block->escapeHtml(__('Custom Return Reason Text')) ?></span></th>
+                </tr>
+                </thead>
+                <?php $isRmaEligible = false; ?>
+                <?php foreach ($_items as $_item): ?>
+                    <?php $itemId = $_item->getItemId(); ?>
+                    <?php $orderedQty = $_item->getQtyOrdered(); ?>
+                    <?php $returnedQty = $_item->getQtyReturned(); ?>
+                    <?php $availableQty = $_item->getQtyOrdered() - $_item->getQtyReturned(); ?>
+                    <?php $eligibleForReturn = ($availableQty > 0 && $_item->getData('can_return')); ?>
+                    <?php $isRmaEligible = !$isRmaEligible && $eligibleForReturn ?: $isRmaEligible;   ?>
+                    <tbody class="cart item">
+                        <tr class="item-info">
+                            <td class="col item">
+                                <input id="items:item<?= $itemId ?>" name="items[<?= $itemId ?>][order_item_id]" class="input-checkbox" type="checkbox"
+                                       value="<?= /* @escapeNotVerified */ $itemId ?>"
+                                       <?php if (!$eligibleForReturn): ?>disabled<?php endif; ?> />
+                            </td>
+                            <td data-th="<?= $block->escapeHtml(__('Name')) ?>" class="col item">
+                                <div class="field product-name">
+                                    <label for="items:item<?= $itemId ?>" class="label">
+                                        <span>
+                                            <?= $block->escapeHtml($_item->getName()) ?>
+                                        </span>
+                                    </label>
+                                </div>
+                                <div class="item-attributes-container">
+                                    <?php $itemAttributes = $_item->getItemAttributes();?>
+                                    <?php if ($itemAttributes): ?>
+                                        <?php foreach ($itemAttributes as $attributeName => $attributeValue):?>
+                                            <div class="item-attribute">
+                                                <span class="attr-name"><?= /* @escapeNotVerified */ __($attributeName) . ":" ?></span>
+                                                <span class="attr-value"><?= /* @escapeNotVerified */ __($attributeValue) ?></span>
+                                            </div>
+                                        <?php endforeach;?>
+                                    <?php endif; ?>
+                                </div>
+                            </td>
+                            <td data-th="<?= $block->escapeHtml(__('SKU')) ?>" class="col item">
+                                <div class="item-sku"><?= /* @escapeNotVerified */ $_item->getSku() ?></div>
+                                <input type="hidden" name="items[<?= $itemId ?>][sku]" id="items:sku<?= $itemId ?>" value="<?= /* @escapeNotVerified */ $_item->getSku() ?>">
+                            </td>
+                            <td data-th="<?= $block->escapeHtml(__('Price')) ?>" class="col item">
+                                <div class="price item-price" data-item-price="<?= /* @escapeNotVerified */ $_item->getPrice() ?>">
+                                    <?= /* @escapeNotVerified */ $block->formatPrice($_item->getPrice()) ?>
+                                </div>
+                            </td>
+                            <td data-th="<?= $block->escapeHtml(__('QTY')) ?>" class="col item" style="display: none">
+                                <div class="field qty required">
+                                    <?php if ($eligibleForReturn): ?>
+                                        <span class="rma-qty hidden"><?= /* @escapeNotVerified */ $availableQty ?></span>
+                                        <select class="hidden"
+                                                name="items[<?= $itemId ?>][qty_requested]"
+                                                id="items:qty_requested<?= /* @escapeNotVerified */ $itemId ?>">
+                                            <?php for ($qtyIndex = 1; $qtyIndex <= $availableQty; ++$qtyIndex): ?>
+                                                <option value="<?= /* @escapeNotVerified */ $qtyIndex ?>"><?= /* @escapeNotVerified */ $qtyIndex ?></option>
+                                            <?php endfor;?>
+                                        </select>
+                                    <?php else: ?>
+                                        <span class="rma-disable-msg"><?= /* @escapeNotVerified */ __('Not Eligible for Return') ?></span>
+                                    <?php endif; ?>
+                                </div>
+                            </td>
+                            <td data-th="<?= $block->escapeHtml(__('Reason to Return')) ?>" class="col item">
+                                <?php if ($eligibleForReturn): ?>
+                                    <div class="item reason required">
+                                        <div class="control">
+                                            <select id="items:reason<?= $itemId ?>" name="items[<?= $itemId ?>][reason]" class="select">
+                                                <option value="" selected="selected"> </option>
+                                                <?php foreach ($_rmaReasons as $_reasonId => $_reasonText): ?>
+                                                    <option value="<?= /* @escapeNotVerified */ $_reasonId ?>"><?= /* @escapeNotVerified */ $_reasonText ?></option>
+                                                <?php endforeach;?>
+                                            </select>
+                                        </div>
+                                    </div>
+                                <?php endif;?>
+                            </td>
+                            <td data-th="<?= $block->escapeHtml(__('Custom Return Reason Text')) ?>" class="col item">
+                                <?php if ($eligibleForReturn): ?>
+                                    <div class="reason_text required">
+                                        <div class="control">
+                                            <textarea id="items:reason_text<?= $itemId ?>" name="items[<?= $itemId ?>][reason_text]"></textarea>
+                                        </div>
+                                    </div>
+                                <?php endif;?>
+                            </td>
+                        </tr>
+                    </tbody>
+                <?php endforeach ?>
+            </table>
+        </div>
+    </fieldset>
+    <?php /*END returning-items*/ ?>
+    <div class="actions-toolbar">
+        <div class="secondary">
+            <a href="<?= /* @escapeNotVerified */ $block->getBackUrl() ?>" class="action back"><span><?= /* @escapeNotVerified */ __('Back') ?></span></a>
+        </div>
+        <div class="primary">
+            <?php if ($isRmaEligible): ?>
+                <button type="submit" class="action submit primary" id="submit.save" title="<?= /* @escapeNotVerified */ __('Submit Return') ?>"><span><?= /* @escapeNotVerified */ __('Submit Return') ?></span></button>
+            <?php else: ?>
+                <span class="rma-disable-msg"><?= /* @escapeNotVerified */ __('Not Eligible for Return') ?></span>
+            <?php endif; ?>
+        </div>
+    </div>
+    <script type="text/javascript">
+        require(['jquery'],function($){
+            $('.input-checkbox').click(function(){
+                let id = $(this).val();
+                let reasonsSelector = '#items\\:reason' + id;
+                if ($(this).is(':checked')) {
+                    $(reasonsSelector).addClass('validate-select required-entry').attr('aria-required', 'true');
+                } else {
+                    $(reasonsSelector).removeClass('validate-select required-entry').removeAttr('aria-required');
+                }
+            });
+        });
+    </script>
+
+    <script type="text/x-magento-init">
+        {
+            "#rma_create_form": {
+                "validation": {
+                     "ignore": ":hidden:not(input[id$='_value'])"
+                }
+            }
+        }
+    </script>
+</form>

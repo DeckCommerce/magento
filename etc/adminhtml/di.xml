@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @author DeckCommerce Team
+ * @copyright Copyright (c) 2020 DeckCommerce (https://www.deckcommerce.com)
+ * @package DeckCommerce_Integration
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="Magento\Sales\Controller\AbstractController\OrderLoader"
+                type="DeckCommerce\Integration\Controller\Sales\AbstractController\OrderLoader" />
+    <preference for="Magento\Sales\Controller\Order\Reorder"
+                type="DeckCommerce\Integration\Controller\Sales\Order\Reorder" />
+    <preference for="Magento\Sales\Helper\Guest"
+                type="DeckCommerce\Integration\Helper\Sales\Guest" />
+    <preference for="Magento\Sales\Helper\Reorder" type="DeckCommerce\Integration\Helper\Sales\Reorder" />
+</config>

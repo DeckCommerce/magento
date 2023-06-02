@@ -1,0 +1,66 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @author DeckCommerce Team
+ * @copyright Copyright (c) 2020 DeckCommerce (https://www.deckcommerce.com)
+ * @package DeckCommerce_Integration
+ */
+-->
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="deck_shipping_method" resource="default" engine="innodb" comment="Deck Commerce Shipping Method">
+        <column xsi:type="smallint" name="deck_method_id" unsigned="true" nullable="false" identity="true"
+                comment="Method ID"/>
+        <column xsi:type="varchar" name="deck_method_name" nullable="true" length="255" comment="Deck Commerce Method Name"/>
+        <column xsi:type="smallint" name="is_enabled" unsigned="false" nullable="false" identity="false"
+                default="0" comment="Is Enabled"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="deck_method_id"/>
+        </constraint>
+        <constraint xsi:type="unique" referenceId="DECK_METHOD_NAME">
+            <column name="deck_method_name"/>
+        </constraint>
+    </table>
+    <table name="deck_shipping_method_map" resource="default" engine="innodb" comment="Deck Commerce Shipping Methods Mapping">
+        <column xsi:type="int" name="map_id" unsigned="true" nullable="false" identity="true"
+                comment="Map ID"/>
+        <column xsi:type="varchar" name="method" nullable="true" length="255" comment="Magento Method Name"/>
+        <column xsi:type="smallint" name="deck_method_id" unsigned="true" nullable="false" identity="false"
+                default="0" comment="Deck Method ID"/>
+        <column xsi:type="smallint" name="is_enabled" unsigned="false" nullable="false" identity="false"
+                default="0" comment="Is Enabled"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="map_id"/>
+        </constraint>
+        <constraint xsi:type="unique" referenceId="DECK_MAGENTO_METHOD">
+            <column name="method"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="DECK_SHIP_METH_MAP_METH_ID_DECK_SHIP_METH_ID"
+                    table="deck_shipping_method_map" column="deck_method_id" referenceTable="deck_shipping_method"
+                    referenceColumn="deck_method_id" onDelete="CASCADE"/>
+        <index referenceId="DECK_METHOD_ID" indexType="btree">
+            <column name="deck_method_id"/>
+        </index>
+    </table>
+    <table name="deck_inventory_log" resource="default" engine="innodb" comment="Deck Commerce Inventory Import Log">
+        <column xsi:type="int" name="id" unsigned="true" nullable="false" identity="true"
+                comment="Log ID"/>
+        <column xsi:type="smallint" name="type" unsigned="true" nullable="false" identity="false"
+                default="0" comment="Inventory Type: 0 - Full, 1 - Delta"/>
+        <column xsi:type="timestamp" name="started_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP"
+                comment="Started At"/>
+        <column xsi:type="varchar" name="file" nullable="false" default="" length="255" comment="Processed File"/>
+        <column xsi:type="smallint" name="status" unsigned="true" nullable="false" identity="false"
+                default="0" comment="Import Status: 0 - In progress, 1 - Successfully Finished, 2 - Failed"/>
+        <column xsi:type="varchar" name="message" nullable="false" default="" length="255" comment="Result Message"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="id"/>
+        </constraint>
+        <index referenceId="DECK_INVENTORY_IMPORT_TYPE" indexType="btree">
+            <column name="type"/>
+        </index>
+        <index referenceId="DECK_INVENTORY_IMPORT_STATUS" indexType="btree">
+            <column name="status"/>
+        </index>
+    </table>
+</schema>

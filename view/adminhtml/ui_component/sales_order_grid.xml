@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * @author DeckCommerce Team
+ * @copyright Copyright (c) 2020 DeckCommerce (https://www.deckcommerce.com)
+ * @package DeckCommerce_Integration
+ */
+-->
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <columns name="sales_order_columns">
+        <column name="deck_export_status">
+            <argument name="data" xsi:type="array">
+                <item name="options" xsi:type="object">DeckCommerce\Integration\Ui\Component\Order\Listing\Column\ExportStatus\Options</item>
+                <item name="config" xsi:type="array">
+                    <item name="filter" xsi:type="string">select</item>
+                    <item name="component" xsi:type="string">Magento_Ui/js/grid/columns/select</item>
+                    <item name="dataType" xsi:type="string">select</item>
+                    <item name="label" xsi:type="string" translate="true">Deck Commerce Export Status</item>
+                </item>
+            </argument>
+        </column>
+    </columns>
+    <listingToolbar name="listing_top">
+        <massaction name="listing_massaction">
+            <action name="move_order_to_deck_pending" sortOrder="1">
+                <argument name="data" xsi:type="array">
+                    <item name="sortOrder" xsi:type="string">1</item>
+                </argument>
+                <settings>
+                    <url path="deck/order/moveToPending"/>
+                    <type>move_order_to_deck_pending</type>
+                    <label translate="true">Deck Commerce - Move To Pending</label>
+                </settings>
+            </action>
+        </massaction>
+    </listingToolbar>
+</listing>

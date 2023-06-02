@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @author DeckCommerce Team
+ * @copyright Copyright (c) 2020 DeckCommerce (https://www.deckcommerce.com)
+ * @package DeckCommerce_Integration
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <event name="checkout_submit_all_after">
+        <observer name="deck_order_checkout_submit_all_after" instance="DeckCommerce\Integration\Observer\AfterOrderSubmit"/>
+    </event>
+    <event name="paypal_express_place_order_success">
+        <observer name="deck_order_paypal_express_place_order_success" instance="DeckCommerce\Integration\Observer\AfterOrderSubmit"/>
+    </event>
+    <event name="cybersource_order_submit_after">
+        <observer name="deck_order_cybersource_order_submit_after" instance="DeckCommerce\Integration\Observer\AfterOrderSubmit"/>
+    </event>
+</config>

@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @author DeckCommerce Team
+ * @copyright Copyright (c) 2020 DeckCommerce (https://www.deckcommerce.com)
+ * @package DeckCommerce_Integration
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Cron:etc/crontab.xsd">
+    <group id="default">
+        <job name="deck_clean_logs" instance="DeckCommerce\Integration\Cron\CleanInventoryLogs" method="execute">
+            <schedule>10 2 * * *</schedule>
+        </job>
+        <job name="deck_order_export" instance="DeckCommerce\Integration\Cron\OrderExportScheduled" method="execute" />
+        <job name="deck_full_inventory_import" instance="DeckCommerce\Integration\Cron\FullInventoryImportScheduled" method="execute" />
+        <job name="deck_delta_inventory_import" instance="DeckCommerce\Integration\Cron\DeltaInventoryImportScheduled" method="execute" />
+    </group>
+</config>

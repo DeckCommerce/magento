@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @author DeckCommerce Team
+ * @copyright Copyright (c) 2020 DeckCommerce (https://www.deckcommerce.com)
+ * @package DeckCommerce_Integration
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <deck_commerce_inventory>
+            <inventory_check>
+                <api_name>api/PimInventoryLookup</api_name>
+                <check_inventory_on_pdp>1</check_inventory_on_pdp>
+                <check_inventory_on_cart>1</check_inventory_on_cart>
+                <check_inventory_on_checkout>1</check_inventory_on_checkout>
+                <cache_lifetime>30</cache_lifetime>
+            </inventory_check>
+            <full_inventory_import>
+                <history_directory>/import/deck/full_inventory/</history_directory>
+                <logs_lifetime>30</logs_lifetime>
+            </full_inventory_import>
+            <delta_inventory_import>
+                <history_directory>/import/deck/delta_inventory/</history_directory>
+                <frequency>30</frequency>
+                <logs_lifetime>30</logs_lifetime>
+            </delta_inventory_import>
+        </deck_commerce_inventory>
+        <deck_commerce_sales>
+            <order>
+                <api_name>api/OMSInBoundOrder</api_name>
+                <upc_attribute>sku</upc_attribute>
+                <history_directory>/import/deck_inventory_history/</history_directory>
+                <default_method>GROUND</default_method>
+                <send_immediately>1</send_immediately>
+                <cron_schedule>*/5 * * * *</cron_schedule>
+            </order>
+            <order_history>
+                <api_name>api/OmsOrderHistory</api_name>
+                <cache_lifetime>300</cache_lifetime>
+            </order_history>
+            <rma>
+                <api_name>api/OmsRmaCreate</api_name>
+                <default_type>1</default_type>
+            </rma>
+        </deck_commerce_sales>
+    </default>
+</config>

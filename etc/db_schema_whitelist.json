@@ -1,0 +1,46 @@
+{
+    "deck_shipping_method": {
+        "column": {
+            "deck_method_id": true,
+            "deck_method_name": true
+        },
+        "index": {
+            "DECK_METHOD_NAME": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    },
+    "deck_shipping_method_map": {
+        "column": {
+            "map_id": true,
+            "method": true,
+            "deck_method_id": true
+        },
+        "index": {
+            "DECK_SHIP_METH_MAP_METH_ID_DECK_SHIP_METH_ID": true,
+            "DECK_METHOD_NAME": true,
+            "DECK_METHOD_ID": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    },
+    "deck_inventory_log": {
+        "column": {
+            "id": true,
+            "type": true,
+            "started_at": true,
+            "file": true,
+            "status": true,
+            "message": true
+        },
+        "index": {
+            "DECK_INVENTORY_IMPORT_TYPE": true,
+            "DECK_INVENTORY_IMPORT_STATUS": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    }
+}

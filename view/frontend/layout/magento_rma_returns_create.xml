@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @author DeckCommerce Team
+ * @copyright Copyright (c) 2021 DeckCommerce (https://www.deckcommerce.com)
+ * @package DeckCommerce_Integration
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <update handle="customer_account"/>
+    <update handle="magento_rma_returns_create_handle"/>
+    <body>
+        <referenceContainer name="content">
+            <block class="DeckCommerce\Integration\Block\Rma\Create" as="create" name="rma.returns.create" cacheable="false">
+                <action method="setFormCode">
+                    <argument name="code" xsi:type="string">default</argument>
+                </action>
+                <action method="setEntityModelClass">
+                    <argument name="code" xsi:type="string">Magento\Rma\Model\Item</argument>
+                </action>
+            </block>
+        </referenceContainer>
+    </body>
+</page>

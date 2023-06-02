@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @author DeckCommerce Team
+ * @copyright Copyright (c) 2020 DeckCommerce (https://www.deckcommerce.com)
+ * @package DeckCommerce_Integration
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <add id="DeckCommerce_Integration::menu"
+             title="Deck Commerce"
+             module="DeckCommerce_Integration"
+             translate="title"
+             sortOrder="50"
+             resource="DeckCommerce_Integration::menu"/>
+        <add
+            id="DeckCommerce_Integration::deck_shipping_method"
+            title="Manage Shipping Methods"
+            module="DeckCommerce_Integration"
+            sortOrder="10"
+            parent="DeckCommerce_Integration::menu"
+            action="deck/shipping_method/index"
+            resource="DeckCommerce_Integration::deck_shipping"/>
+        <add
+            id="DeckCommerce_Integration::deck_shipping_map"
+            title="Map Shipping Methods"
+            module="DeckCommerce_Integration"
+            sortOrder="20"
+            parent="DeckCommerce_Integration::menu"
+            action="deck/shipping_map/index"
+            resource="DeckCommerce_Integration::deck_shipping"/>
+        <add
+            id="DeckCommerce_Integration::deck_inventory_import"
+            title="Inventory Import"
+            module="DeckCommerce_Integration"
+            sortOrder="30"
+            parent="DeckCommerce_Integration::menu"
+            action="deck/inventory_log/index"
+            resource="DeckCommerce_Integration::deck_inventory"/>
+        <add
+            id="DeckCommerce_Integration::configuration"
+            title="Configurations"
+            module="DeckCommerce_Integration"
+            sortOrder="40"
+            parent="DeckCommerce_Integration::menu"
+            action="adminhtml/system_config/edit/section/deck_commerce_general/"
+            resource="DeckCommerce_Integration::configuration"/>
+    </menu>
+</config>

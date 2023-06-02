@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @author DeckCommerce Team
+ * @copyright Copyright (c) 2020 DeckCommerce (https://www.deckcommerce.com)
+ * @package DeckCommerce_Integration
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="sales.order.view">
+            <block class="DeckCommerce\Integration\Block\Sales\Order\Items" name="order_items" template="Magento_Sales::order/items.phtml" cacheable="false">
+                <block class="Magento\Framework\View\Element\RendererList" name="sales.order.items.renderers" as="renderer.list"/>
+                <block class="Magento\Theme\Block\Html\Pager" name="sales_order_item_pager"/>
+                <block class="Magento\Sales\Block\Order\Totals" name="order_totals" template="Magento_Sales::order/totals.phtml">
+                    <arguments>
+                        <argument name="label_properties" xsi:type="string">colspan="4" class="mark"</argument>
+                        <argument name="value_properties" xsi:type="string">class="amount"</argument>
+                    </arguments>
+                    <block class="Magento\Tax\Block\Sales\Order\Tax" name="tax" template="Magento_Tax::order/tax.phtml"/>
+                </block>
+            </block>
+        </referenceBlock>
+    </body>
+</page>

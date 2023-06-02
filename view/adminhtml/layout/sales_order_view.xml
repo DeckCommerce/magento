@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @author DeckCommerce Team
+ * @copyright Copyright (c) 2020 DeckCommerce (https://www.deckcommerce.com)
+ * @package DeckCommerce_Integration
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="sales_order_edit">
+            <block class="DeckCommerce\Integration\Block\Adminhtml\Order\View\SendButton" name="deck_order_send_button">
+                <action method="addSendButton"/>
+            </block>
+            <block class="DeckCommerce\Integration\Block\Adminhtml\Order\View\ViewOnDeck" name="deck_order_view">
+                <action method="viewOnDeck"/>
+            </block>
+        </referenceBlock>
+    </body>
+</page>

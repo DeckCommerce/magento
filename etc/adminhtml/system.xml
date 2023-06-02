@@ -1,0 +1,369 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @author DeckCommerce Team
+ * @copyright Copyright (c) 2020 DeckCommerce (https://www.deckcommerce.com)
+ * @package DeckCommerce_Integration
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <tab id="deck_commerce" translate="label" sortOrder="500">
+            <label>Deck Commerce</label>
+        </tab>
+        <section id="deck_commerce_general" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+            <class>separator-top</class>
+            <label>General</label>
+            <tab>deck_commerce</tab>
+            <resource>DeckCommerce_Integration::config_deck_commerce_general</resource>
+            <group id="general" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>General Settings</label>
+                <field id="enabled" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="web_api_url" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Web API Url</label>
+                    <validate>required-entry no-whitespace</validate>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                </field>
+                <field id="site_code" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Site Code</label>
+                    <validate>required-entry no-whitespace</validate>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                </field>
+                <field id="site_api_key" translate="label" type="obscure" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Site Api Key</label>
+                    <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                    <validate>required-entry no-whitespace</validate>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                </field>
+            </group>
+        </section>
+        <section id="deck_commerce_inventory" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+            <class>separator-top</class>
+            <label>Inventory</label>
+            <tab>deck_commerce</tab>
+            <resource>DeckCommerce_Integration::config_deck_commerce_inventory</resource>
+            <group id="inventory_check" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Inventory Check Settings</label>
+                <field id="enabled" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="api_name" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>API Name</label>
+                    <comment>Deck Commerce Inventory API Name</comment>
+                    <validate>required-entry no-whitespace</validate>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                </field>
+                <field id="feed_name" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Inventory Feed Name</label>
+                    <comment>Deck Commerce Inventory Feed Name.</comment>
+                    <validate>required-entry no-whitespace</validate>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                </field>
+                <field id="check_inventory_on_pdp" translate="label" type="select" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Check On PDP</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                    <comment>Check inventory on Add To Cart action from Product page</comment>
+                </field>
+                <field id="check_inventory_on_cart" translate="label" type="select" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Check On Cart Page</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                    <comment>Check inventory on Cart page</comment>
+                </field>
+                <field id="check_inventory_on_checkout" translate="label" type="select" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Check On Checkout</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                    <comment>Check inventory on Checkout pages</comment>
+                </field>
+                <field id="cache_lifetime" translate="label" type="text" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Inventory Check Cache Lifetime</label>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                    <comment>Cache lifetime for Inventory Check API request (in seconds). 0 - disable cache</comment>
+                </field>
+                <field id="debug" translate="label" type="select" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Debug Mode</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                    <comment>Log API requests and responses to /var/log/deck_commerce.log</comment>
+                </field>
+            </group>
+            <group id="full_inventory_import" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Full Inventory Import Settings</label>
+                <field id="enabled" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="sftp_host" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>SFTP Host</label>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                </field>
+                <field id="sftp_username" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>SFTP Username</label>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                </field>
+                <field id="sftp_password" translate="label" type="obscure" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>SFTP Password</label>
+                    <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                </field>
+                <field id="sftp_directory" translate="label" type="text" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Source Directory on SFTP server</label>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                    <comment>Directory to Source Files on SFTP server</comment>
+                </field>
+                <field id="source_file_prefix" translate="label" type="text" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Source File Prefix On SFTP Server</label>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                    <comment>File prefix on Customer SFTP. Example for file magento-inventory-fromDeck-20200101.csv: "magento-inventory-fromDeck-"</comment>
+                </field>
+                <field id="history_directory" translate="label" type="text" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Import History Directory</label>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                    <comment>Magento subdirectory in /var/ to store source files after processing (VAR Directory Relative Path). Example: /import/deck_inventory/</comment>
+                </field>
+                <field id="time" translate="label" type="time" sortOrder="80" showInDefault="1">
+                    <label>Start Time Of Scheduled Import</label>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                </field>
+                <field id="frequency" translate="label" type="select" sortOrder="90" showInDefault="1">
+                    <label>Import Frequency</label>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                    <source_model>Magento\Cron\Model\Config\Source\Frequency</source_model>
+                    <backend_model>DeckCommerce\Integration\Model\Config\Backend\FullInventoryCron</backend_model>
+                </field>
+                <field id="logs_lifetime" translate="label" type="text" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Logs Lifetime In Days</label>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                    <comment>Remove logs that are older than specified config value (in days)</comment>
+                </field>
+            </group>
+            <group id="delta_inventory_import" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Delta Inventory Import Settings</label>
+                <field id="enabled" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="sftp_host" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>SFTP Host</label>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                </field>
+                <field id="sftp_username" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>SFTP Username</label>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                </field>
+                <field id="sftp_password" translate="label" type="obscure" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>SFTP Password</label>
+                    <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                </field>
+                <field id="sftp_directory" translate="label" type="text" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Source Directory on SFTP server</label>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                    <comment>Directory to Source Files on SFTP server</comment>
+                </field>
+                <field id="source_file_prefix" translate="label" type="text" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Source File Prefix On SFTP Server</label>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                    <comment>File prefix on Customer SFTP. Example for file magento-delta-inventory-fromDeck-20200101.csv: "magento-delta-inventory-fromDeck-"</comment>
+                </field>
+                <field id="history_directory" translate="label" type="text" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Import History Directory</label>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                    <comment>Magento subdirectory in /var/ to store source files after processing (VAR Directory Relative Path). Example: /import/deck_inventory/</comment>
+                </field>
+                <field id="frequency" translate="label" type="select" sortOrder="80" showInDefault="1">
+                    <label>Import Frequency</label>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                    <source_model>DeckCommerce\Integration\Model\Config\Source\DeltaInventoryFrequency</source_model>
+                    <backend_model>DeckCommerce\Integration\Model\Config\Backend\DeltaInventoryCron</backend_model>
+                </field>
+                <field id="logs_lifetime" translate="label" type="text" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Logs Lifetime In Days</label>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                    <comment>Remove logs that are older than specified config value (in days)</comment>
+                </field>
+            </group>
+        </section>
+        <section id="deck_commerce_sales" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+            <class>separator-top</class>
+            <label>Sales</label>
+            <tab>deck_commerce</tab>
+            <resource>DeckCommerce_Integration::config_deck_commerce_sales</resource>
+            <group id="order" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Order Export Settings</label>
+                <field id="enabled" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="api_name" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>API Name</label>
+                    <comment>Deck Commerce Order Api Name</comment>
+                    <validate>required-entry no-whitespace</validate>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                </field>
+                <field id="default_method" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Default Shipping Method</label>
+                    <comment>Default Deck Commerce shipping method to be sent to Deck Commerce on order export. It's used if there are no mapped shipping methods found in the mapping table. See Deck Commerce - Map Shipping Methods.</comment>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                </field>
+                <field id="upc_attribute" translate="label" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Order Item UPC (GTIN) Attribute</label>
+                    <source_model>DeckCommerce\Integration\Model\Config\Source\Product\Attributes</source_model>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                </field>
+                <field id="send_immediately" translate="label" type="select" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Send Order Immediately</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Setting to export order immediately after order placement. Otherwise, pending order can be sent via cron or manually from the order page.</comment>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                </field>
+                <field id="export_frequency" translate="label" type="select" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Scheduled Order Export Frequency</label>
+                    <source_model>DeckCommerce\Integration\Model\Config\Source\OrderExportFrequency</source_model>
+                    <backend_model>DeckCommerce\Integration\Model\Config\Backend\OrderExportCron</backend_model>
+                    <depends>
+                        <field id="enabled">1</field>
+                        <field id="send_immediately">0</field>
+                    </depends>
+                    <comment>Frequency of automatic orders export. Allows to export already placed orders independently from checkout process. Used if "Send Order Immediately" setting is disabled.</comment>
+                </field>
+                <field id="debug" translate="label" type="select" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Debug Mode</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                    <comment>Log API requests and responses to /var/log/deck_commerce.log</comment>
+                </field>
+            </group>
+            <group id="order_history" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Order History</label>
+                <field id="enabled" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="api_name" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>API Name</label>
+                    <comment>Deck Commerce Order History API Name</comment>
+                    <validate>required-entry no-whitespace</validate>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                </field>
+                <field id="cache_lifetime" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Orders History Cache Lifetime</label>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                    <comment>Cache Lifetime for Orders History API Request (in seconds). 0 - disable cache.</comment>
+                </field>
+                <field id="debug" translate="label" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Debug Mode</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                    <comment>Log API requests and responses to /var/log/deck_commerce.log</comment>
+                </field>
+            </group>
+            <group id="rma" translate="label" type="text" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>RMA Export Settings</label>
+                <field id="enabled" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enabled</label>
+                    <source_model>DeckCommerce\Integration\Model\Config\Source\RmaIsEnabled</source_model>
+                </field>
+                <field id="api_name" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>API Name</label>
+                    <comment>Deck Commerce RMA Api Name</comment>
+                    <validate>required-entry no-whitespace</validate>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                </field>
+                <field id="default_type" translate="label" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Default RMA Type</label>
+                    <source_model>DeckCommerce\Integration\Model\Config\Source\RmaTypes</source_model>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                </field>
+                <field id="debug" translate="label" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Debug Mode</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                    <comment>Log API requests and responses to /var/log/deck_commerce.log</comment>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

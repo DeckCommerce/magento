@@ -1,0 +1,60 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @author DeckCommerce Team
+ * @copyright Copyright (c) 2020 DeckCommerce (https://www.deckcommerce.com)
+ * @package DeckCommerce_Integration
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="Magento\Sales\Controller\AbstractController\OrderLoader"
+                type="DeckCommerce\Integration\Controller\Sales\AbstractController\OrderLoader" />
+    <preference for="Magento\Sales\Controller\Order\Reorder"
+                type="DeckCommerce\Integration\Controller\Sales\Order\Reorder" />
+    <preference for="Magento\Sales\Controller\Order\PrintShipment"
+                type="DeckCommerce\Integration\Controller\Sales\Order\PrintShipment" />
+    <preference for="Magento\Sales\Controller\Guest\PrintShipment"
+                type="DeckCommerce\Integration\Controller\Sales\Guest\PrintShipment" />
+    <preference for="Magento\Sales\Helper\Guest"
+                type="DeckCommerce\Integration\Helper\Sales\Guest" />
+    <preference for="Magento\Sales\Helper\Reorder"
+                type="DeckCommerce\Integration\Helper\Sales\Reorder" />
+    <preference for="Magento\Shipping\Model\Info"
+                type="DeckCommerce\Integration\Model\Shipping\Info" />
+    <preference for="Magento\Shipping\Helper\Data"
+                type="DeckCommerce\Integration\Helper\Shipping\Data" />
+    <preference for="Magento\Rma\Block\Order\Link"
+                type="DeckCommerce\Integration\Block\Rma\Order\Link" />
+    <preference for="Magento\Rma\Block\Returns\Returns"
+                type="DeckCommerce\Integration\Block\Rma\Returns\Returns" />
+    <preference for="Magento\Rma\Block\Returns\View"
+                type="DeckCommerce\Integration\Block\Rma\Returns\View" />
+    <type name="Magento\Sales\Model\Order">
+        <plugin name="deck_sales_order" type="DeckCommerce\Integration\Plugin\Model\Sales\OrderPlugin" />
+    </type>
+    <type name="Magento\Sales\Model\Order\Shipment">
+        <plugin name="deck_sales_order_shipment" type="DeckCommerce\Integration\Plugin\Model\Sales\ShipmentPlugin" />
+    </type>
+    <type name="Magento\Rma\Helper\Data">
+        <plugin name="deck_rma_helper_data" type="DeckCommerce\Integration\Plugin\Helper\Rma\DataPlugin" />
+    </type>
+    <type name="Magento\Sales\Controller\Order\Reorder">
+        <plugin name="replaceQuoteItems" disabled="true" />
+        <plugin name="deckCommerceReplaceQuoteItems" type="DeckCommerce\Integration\Plugin\NegotiableQuote\Sales\Controller\Order\ReorderPlugin" sortOrder="10" disabled="false"/>
+    </type>
+
+    <preference for="Magento\Rma\Controller\Returns\Create"
+                type="DeckCommerce\Integration\Controller\Rma\Returns\Create" />
+
+    <preference for="Magento\Rma\Controller\Returns\Create"
+                type="DeckCommerce\Integration\Controller\Rma\Returns\Create" />
+    <preference for="Magento\Rma\Controller\Returns\Returns"
+                type="DeckCommerce\Integration\Controller\Rma\Returns\Returns" />
+    <preference for="Magento\Rma\Controller\Returns\View"
+                type="DeckCommerce\Integration\Controller\Rma\Returns\View" />
+
+    <preference for="Magento\Rma\Controller\Guest\Create"
+                type="DeckCommerce\Integration\Controller\Rma\Guest\Create" />
+    <preference for="Magento\Rma\Controller\Guest\View"
+                type="DeckCommerce\Integration\Controller\Rma\Guest\View" />
+</config>

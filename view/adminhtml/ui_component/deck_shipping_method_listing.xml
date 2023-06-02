@@ -1,0 +1,147 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @author DeckCommerce Team
+ * @copyright Copyright (c) 2020 DeckCommerce (https://www.deckcommerce.com)
+ * @package DeckCommerce_Integration
+ */
+-->
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">deck_shipping_method_listing.deck_shipping_method_listing_data_source</item>
+        </item>
+    </argument>
+    <settings>
+        <buttons>
+            <button name="add">
+                <url path="deck/shipping_method/new"/>
+                <class>primary</class>
+                <label translate="true">Add New</label>
+            </button>
+        </buttons>
+        <spinner>deck_shipping_method_listing_columns</spinner>
+        <deps>
+            <dep>deck_shipping_method_listing.deck_shipping_method_listing_data_source</dep>
+        </deps>
+    </settings>
+    <dataSource name="deck_shipping_method_listing_data_source" component="Magento_Ui/js/grid/provider">
+        <settings>
+            <storageConfig>
+                <param name="indexField" xsi:type="string">deck_method_id</param>
+            </storageConfig>
+            <updateUrl path="mui/index/render"/>
+        </settings>
+        <aclResource>DeckCommerce_Integration::deck_inventory</aclResource>
+        <dataProvider class="Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider" name="deck_shipping_method_listing_data_source">
+            <settings>
+                <requestFieldName>deck_method_id</requestFieldName>
+                <primaryFieldName>deck_method_id</primaryFieldName>
+            </settings>
+        </dataProvider>
+    </dataSource>
+    <listingToolbar name="listing_top">
+        <settings>
+            <sticky>true</sticky>
+        </settings>
+        <bookmark name="bookmarks"/>
+        <columnsControls name="columns_controls"/>
+        <filterSearch name="name"/>
+        <filters name="listing_filters">
+            <settings>
+                <templates>
+                    <filters>
+                        <select>
+                            <param name="template" xsi:type="string">ui/grid/filters/elements/ui-select</param>
+                            <param name="component" xsi:type="string">Magento_Ui/js/form/element/ui-select</param>
+                        </select>
+                    </filters>
+                </templates>
+            </settings>
+        </filters>
+        <massaction name="listing_massaction" component="Magento_Ui/js/grid/tree-massactions">
+            <action name="enable">
+                <settings>
+                    <confirm>
+                        <message translate="true">Enable selected items?</message>
+                        <title translate="true">Enable items</title>
+                    </confirm>
+                    <url path="deck/shipping_method/massEnable"/>
+                    <type>enable</type>
+                    <label translate="true">Enable</label>
+                </settings>
+            </action>
+            <action name="disable">
+                <settings>
+                    <confirm>
+                        <message translate="true">Disable selected items?</message>
+                        <title translate="true">Disable items</title>
+                    </confirm>
+                    <url path="deck/shipping_method/massDisable"/>
+                    <type>disable</type>
+                    <label translate="true">Disable</label>
+                </settings>
+            </action>
+        </massaction>
+        <paging name="listing_paging"/>
+    </listingToolbar>
+    <columns name="deck_shipping_method_listing_columns">
+        <settings>
+            <childDefaults>
+                <param name="fieldAction" xsi:type="array">
+                    <item name="provider" xsi:type="string">deck_shipping_method_listing.deck_shipping_method_listing.deck_shipping_method_listing_columns.actions</item>
+                    <item name="target" xsi:type="string">applyAction</item>
+                    <item name="params" xsi:type="array">
+                        <item name="0" xsi:type="string">edit</item>
+                        <item name="1" xsi:type="string">${ $.$data.rowIndex }</item>
+                    </item>
+                </param>
+            </childDefaults>
+        </settings>
+        <selectionsColumn name="ids">
+            <settings>
+                <indexField>deck_method_id</indexField>
+            </settings>
+        </selectionsColumn>
+        <column name="deck_method_name">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Deck Commerce Method Name</label>
+                <editor>
+                    <editorType>text</editorType>
+                    <validation>
+                        <rule name="required-entry" xsi:type="boolean">true</rule>
+                    </validation>
+                </editor>
+            </settings>
+        </column>
+        <column name="is_enabled" component="Magento_Ui/js/grid/columns/select">
+            <settings>
+                <label translate="true">Is Enabled</label>
+                <filter>select</filter>
+                <dataType>select</dataType>
+                <options>
+                    <option name="0" xsi:type="array">
+                        <item name="value" xsi:type="number">1</item>
+                        <item name="label" xsi:type="string" translate="true">Enabled</item>
+                    </option>
+                    <option name="1" xsi:type="array">
+                        <item name="value" xsi:type="number">0</item>
+                        <item name="label" xsi:type="string" translate="true">Disabled</item>
+                    </option>
+                </options>
+            </settings>
+        </column>
+        <actionsColumn name="actions" class="Magento\Backend\Ui\Component\Listing\Column\EditAction">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="editUrlPath" xsi:type="string">deck/shipping_method/edit</item>
+                    <item name="sortOrder" xsi:type="number">100</item>
+                </item>
+            </argument>
+            <settings>
+                <indexField>deck_method_id</indexField>
+            </settings>
+        </actionsColumn>
+    </columns>
+</listing>
