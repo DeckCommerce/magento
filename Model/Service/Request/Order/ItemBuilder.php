@@ -1,7 +1,7 @@
 <?php
 /**
  * @author DeckCommerce Team
- * @copyright Copyright (c) 2022 DeckCommerce (https://www.deckcommerce.com)
+ * @copyright Copyright (c) 2023 DeckCommerce (https://www.deckcommerce.com)
  * @package DeckCommerce_Integration
  */
 
@@ -62,9 +62,10 @@ class ItemBuilder
 
     /**
      * ItemBuilder constructor.
+     *
      * @param DeckHelper $helper
      * @param Calculation $calculationTool
-     * @param GiftMessageHelper $giftMessage
+     * @param GiftMessageHelper $giftMessageHelper
      * @param GetStockItemConfigurationInterface $getStockItemConfiguration
      */
     public function __construct(

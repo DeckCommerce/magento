@@ -1,7 +1,7 @@
 <?php
 /**
  * @author DeckCommerce Team
- * @copyright Copyright (c) 2022 DeckCommerce (https://www.deckcommerce.com)
+ * @copyright Copyright (c) 2023 DeckCommerce (https://www.deckcommerce.com)
  * @package DeckCommerce_Integration
  */
 
@@ -82,7 +82,7 @@ class Recent extends \Magento\Sales\Block\Order\Recent
     }
 
     /**
-     * Get recently placed orders. By default they will be limited by 5.
+     * Get recently placed orders. By default, they will be limited by 5.
      */
     private function getRecentOrders()
     {

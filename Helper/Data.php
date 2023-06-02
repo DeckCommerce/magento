@@ -1,7 +1,7 @@
 <?php
 /**
  * @author DeckCommerce Team
- * @copyright Copyright (c) 2022 DeckCommerce (https://www.deckcommerce.com)
+ * @copyright Copyright (c) 2023 DeckCommerce (https://www.deckcommerce.com)
  * @package DeckCommerce_Integration
  */
 
@@ -124,6 +124,7 @@ class Data extends Config
      * @param DeckLogger $deckLogger
      * @param Json $jsonSerializer
      * @param AttributeRepositoryInterface $attributeRepositoryInterface
+     * @param ModuleManager $moduleManager
      * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
     public function __construct(
@@ -141,7 +142,6 @@ class Data extends Config
         Json $jsonSerializer,
         AttributeRepositoryInterface $attributeRepositoryInterface,
         ModuleManager $moduleManager
-
     ) {
         $this->cache                        = $cache;
         $this->serializer                   = $serializer;
@@ -572,7 +572,7 @@ class Data extends Config
     }
 
     /**
-     * Json serialize message it it's not a string
+     * Json serialize message if it's not a string
      *
      * @param mixed $message
      * @return bool|string
@@ -594,15 +594,16 @@ class Data extends Config
      *
      * @param string $title
      * @param mixed $message
-     * @return bool
+     * @return void
      */
     public function addInventoryLog($title, $message)
     {
         if (!$this->useInventoryCheckDebug()) {
-            return false;
+            return;
         }
         $message = "==> INVENTORY CHECK: {$title}\n" . $this->getSerializeLogMessage($message);
-        return $this->deckLogger->info($message);
+
+        $this->deckLogger->info($message);
     }
 
     /**
@@ -610,16 +611,16 @@ class Data extends Config
      *
      * @param string $title
      * @param mixed $message
-     * @return bool
+     * @return void
      */
     public function addOrderExportLog($title, $message)
     {
         if (!$this->useOrderExportDebug()) {
-            return false;
+            return;
         }
         $message = "==> ORDER EXPORT: {$title}\n" . $this->getSerializeLogMessage($message);
 
-        return $this->deckLogger->info($message);
+        $this->deckLogger->info($message);
     }
 
     /**
@@ -628,19 +629,19 @@ class Data extends Config
      * @param string $title
      * @param mixed $message
      * @param false $isCancel
-     * @return bool
+     * @return void
      */
     public function addRmaExportLog($title, $message, $isCancel = false)
     {
         if (!$this->useRmaExportDebug()) {
-            return false;
+            return;
         }
 
         $action = $isCancel ? 'CANCEL' : 'EXPORT';
 
         $message = "==> RMA {$action}: {$title}\n" . $this->getSerializeLogMessage($message);
 
-        return $this->deckLogger->info($message);
+        $this->deckLogger->info($message);
     }
 
     /**
@@ -648,15 +649,16 @@ class Data extends Config
      *
      * @param string $title
      * @param mixed $message
-     * @return bool
+     * @return void
      */
     public function addOrderHistoryLog($title, $message)
     {
         if (!$this->useOrderHistoryDebug()) {
-            return false;
+            return;
         }
         $message = "==> ORDER HISTORY: {$title}\n" . $this->getSerializeLogMessage($message);
-        return $this->deckLogger->info($message);
+
+        $this->deckLogger->info($message);
     }
 
     /**
@@ -719,7 +721,7 @@ class Data extends Config
      * Get json unserialized order payment methods mapping
      *
      * @param string $scopeType
-     * @return []
+     * @return mixed|array|bool|int|float|string|null
      */
     public function getPaymentMethodsMapping($scopeType = ScopeInterface::SCOPE_STORE)
     {

@@ -1,7 +1,7 @@
 <?php
 /**
  * @author DeckCommerce Team
- * @copyright Copyright (c) 2022 DeckCommerce (https://www.deckcommerce.com)
+ * @copyright Copyright (c) 2023 DeckCommerce (https://www.deckcommerce.com)
  * @package DeckCommerce_Integration
  */
 
@@ -68,7 +68,6 @@ class QuantityValidatorObserverPlugin
      * @param SourceItemsSaveInterface $sourceItemsSaveInterface
      * @param SearchCriteriaBuilder $searchCriteriaBuilder
      * @param SourceItemRepositoryInterface $sourceItemRepository
-     * @param StockResolverInterface $stockResolver
      */
     public function __construct(
         InventoryCheck $inventoryCheck,
@@ -85,7 +84,7 @@ class QuantityValidatorObserverPlugin
     }
 
     /**
-     * Validate if product available for add too cart action
+     * Validate if product available for add to cart action
      *
      * @param $quoteItem
      * @param $deckQtys

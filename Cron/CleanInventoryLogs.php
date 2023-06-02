@@ -1,7 +1,7 @@
 <?php
 /**
  * @author DeckCommerce Team
- * @copyright Copyright (c) 2022 DeckCommerce (https://www.deckcommerce.com)
+ * @copyright Copyright (c) 2023 DeckCommerce (https://www.deckcommerce.com)
  * @package DeckCommerce_Integration
  */
 
@@ -35,6 +35,11 @@ class CleanInventoryLogs
      * @var InventoryLogResource
      */
     protected $inventoryLogResource;
+
+    /**
+     * @var Filesystem
+     */
+    protected $filesystem;
 
     /**
      * CleanInventoryLogs constructor.

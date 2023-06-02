@@ -39,18 +39,41 @@ It has the following features:
 
 
 ## Requirements
-  * Magento Enterprise Edition 2.3.x-2.4.x
+  * Magento Enterprise (or Cloud) Edition 2.3.x-2.4.x
 
 ## Configuration in Admin Panel
 
-In the left menu: Deck Commerce 
+In the left menu: Deck Commerce
 
 - Manage Shipping Methods - Allows to create Shipping methods used on Deck Commerce side and use them for mapping with Magento shipping methods
 - Map Shipping Methods - Allows to create mapping between Magento and Deck Commerce shipping methods
-- Inventory Import - Shows the history of Full and Delta inventory imports 
+- Inventory Import - Shows the history of Full and Delta inventory imports
 - Configurations - Link to system configuration of extension
 
 ## Installation
+
+### Install or Update Via Composer
+
+To install Deck Commerce Integration via Composer, run the following command in Magento 2 root folder:
+
+```
+composer require deckcommerce/integration-module
+```
+
+You may install a specific version of the module with this command:
+
+```
+composer require deckcommerce/integration-module:2023.1.0
+```
+
+To update extension to the latest version, the following command should be used:
+
+```
+composer update deckcommerce/integration-module
+```
+
+
+### Manual Installation
 
 To install Deck Commerce Integration, create a new directory app/code/DeckCommerce/Integration/ 
 and copy there the contents of the unzipped DeckCommerce_Integration/ folder.
