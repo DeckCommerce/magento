@@ -63,4 +63,12 @@
             <column name="status"/>
         </index>
     </table>
+    <table name="sales_order" resource="default" engine="innodb">
+        <column xsi:type="smallint" name="deck_export_status" unsigned="true" nullable="false" default="0"
+                comment="Deck Commerce Order Export Status"/>
+    </table>
+    <table name="sales_order_grid">
+        <column xsi:type="smallint" name="deck_export_status" unsigned="true" nullable="false" default="0"
+                comment="Deck Commerce Order Export Status"/>
+    </table>
 </schema>
