@@ -10,6 +10,7 @@ It has the following features:
 - Show the Deck Commerce orders, shipments and returns information in the Magento customer’s account in real time.
 - Show the Deck Commerce orders information for guest customer in real time.
 - Create and cancel RMA on Deck Commerce (only in Magento Enterprise Edition)
+- Possibility to use Colorado "Retail Delivery Fee" Tax
 - Possibility to map any config value or payment token or order and payment data based on column names in the corresponding tables. Available mapping sources:
   - "order:[any sales_order table column]" Example: "**order.increment_id**"
   - "payment:[any sales_order_payment column]" Example: "**payment.base_amount_paid**"

@@ -326,6 +326,21 @@
     ]]>
                     </comment>
                 </field>
+                <field id="use_retail_delivery_tax" translate="label" type="select" sortOrder="85" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Use Retail Delivery Tax</label>
+                    <comment>WARNING: Once is setting is enabled the Colorado Retail Delivery Tax Amount will be added to the existing tax on checkout (if Shipping Address State is Colorado).</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                </field>
+                <field id="retail_delivery_tax_amount" translate="label" type="text" sortOrder="87" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Retail Delivery Tax Amount</label>
+                    <comment>Colorado Retail Delivery Tax Amount. "0.27" value is set by default. It will be added to the existing order tax amount</comment>
+                    <depends>
+                        <field id="use_retail_delivery_tax">1</field>
+                    </depends>
+                </field>
                 <field id="debug" translate="label" type="select" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Debug Mode</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>

@@ -33,6 +33,9 @@ class PaymentBuilder
 
     const MAPPING_VARIABLE_TOKEN = '@payment_token';
 
+    /** @var DeckHelper  */
+    protected $helper;
+
     /**
      * CC cards mapping
      *
