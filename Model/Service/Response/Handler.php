@@ -9,7 +9,7 @@ namespace DeckCommerce\Integration\Model\Service\Response;
 
 use DeckCommerce\Integration\Model\Service\Exception\WebapiException;
 use Magento\Framework\Serialize\Serializer\Json;
-use Zend_Http_Response as Response;
+use Laminas\Http\Response;
 
 /**
  * Response Handler
@@ -45,7 +45,7 @@ class Handler implements HandlerInterface
      */
     public function handle(Response $response)
     {
-        $responseBody = (string)$response->getBody();
+        $responseBody = $response->getBody();
 
         try {
             $decodedResponseBody = $this->jsonSerializer->unserialize($responseBody);

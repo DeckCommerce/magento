@@ -7,7 +7,7 @@
 
 namespace DeckCommerce\Integration\Model\Service\Response;
 
-use Zend_Http_Response as Response;
+use Laminas\Http\Response;
 
 /**
  * Response Validator
@@ -109,7 +109,7 @@ class Validator implements ValidatorInterface
      */
     public function validate(Response $response)
     {
-        if (!isset($this->successResponseCodes[$response->getStatus()])) {
+        if (!isset($this->successResponseCodes[$response->getStatusCode()])) {
             $this->addErrorMessage($this->prepareErrorMessage($response));
 
             return false;
@@ -126,7 +126,7 @@ class Validator implements ValidatorInterface
      */
     protected function prepareErrorMessage($response)
     {
-        $responseCode = $response->getStatus();
+        $responseCode = $response->getStatusCode();
         $responseBody = $response->getBody();
         if (isset($this->failedResponseCodes[$responseCode])) {
             return sprintf($this->failedResponseCodes[$responseCode], $responseBody);

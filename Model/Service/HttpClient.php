@@ -11,12 +11,13 @@ use DeckCommerce\Integration\Helper\Data as HelperData;
 use DeckCommerce\Integration\Model\Service\Exception\WebapiException;
 use DeckCommerce\Integration\Model\Service\Response\Handler as ResponseHandler;
 use DeckCommerce\Integration\Model\Service\Response\Validator as ResponseValidator;
-use Magento\Framework\HTTP\ZendClient;
-use Magento\Framework\HTTP\ZendClientFactory;
+use Magento\Framework\HTTP\LaminasClient;
+use Magento\Framework\HTTP\LaminasClientFactory;
 use Magento\Framework\Serialize\Serializer\Json;
 use Magento\Framework\Webapi\Rest\Request;
 use Magento\Store\Model\ScopeInterface;
-use Zend_Http_Response as Response;
+use Laminas\Http\Response;
+use Laminas\Http\Client\Adapter\Curl;
 
 /**
  * API Http Client
@@ -30,7 +31,7 @@ class HttpClient
     const DECK_JSON_DATA_TYPE = 'application/json';
 
     /**
-     * @var ZendClientFactory
+     * @var LaminasClientFactory
      */
     protected $httpClientFactory;
 
@@ -56,14 +57,15 @@ class HttpClient
 
     /**
      * HttpClient constructor.
-     * @param ZendClientFactory $httpClientFactory
+     *
+     * @param LaminasClientFactory $httpClientFactory
      * @param HelperData $helper
      * @param Json $jsonSerializer
      * @param ResponseValidator $responseValidator
      * @param ResponseHandler $responseHandler
      */
     public function __construct(
-        ZendClientFactory $httpClientFactory,
+        LaminasClientFactory $httpClientFactory,
         HelperData $helper,
         Json $jsonSerializer,
         ResponseValidator $responseValidator,
@@ -98,7 +100,7 @@ class HttpClient
         $response = $this->doRequest($apiEndpoint, $apiToken, $method, $params);
 
         if (!$this->responseValidator->validate($response)) {
-            throw new WebapiException(__($this->responseValidator->getErrorMessagesAsString()), $response->getStatus());
+            throw new WebapiException(__($this->responseValidator->getErrorMessagesAsString()), $response->getStatusCode());
         }
 
         return $this->responseHandler->handle($response);
@@ -138,22 +140,26 @@ class HttpClient
         array $params = []
     ): Response {
 
-        /** @var ZendClient $client */
+        /** @var LaminasClient $client */
         $client = $this->httpClientFactory->create();
 
         try {
-            $client->setHeaders(self::DECK_AUTH_TYPE, $apiToken);
-            $client->setHeaders(self::DECK_API_VERSION, self::DECK_API_VERSION_NUMBER);
+            $client->setAdapter(Curl::class);
+            $client->setHeaders([
+                self::DECK_AUTH_TYPE   => $apiToken,
+                self::DECK_API_VERSION => self::DECK_API_VERSION_NUMBER]
+            );
             $client->setUri($uriEndpoint);
             $client->setMethod($requestMethod);
-            $client->setConfig(['timeout' => 60]);
+            $client->setOptions(['timeout' => 60]);
 
             if (!empty($params)) {
                 $encodedData = $this->jsonSerializer->serialize($params);
-                $client->setRawData($encodedData, self::DECK_JSON_DATA_TYPE);
+                $client->setRawBody($encodedData);
+                $client->setEncType(self::DECK_JSON_DATA_TYPE);
             }
 
-            $response = $client->request();
+            $response = $client->send();
 
         } catch (\Exception $e) {
             $data = [
@@ -161,7 +167,9 @@ class HttpClient
                 'Message' => $e->getMessage()
             ];
 
-            $response = new \Zend_Http_Response($e->getCode(), [], $this->jsonSerializer->serialize($data));
+            $response = new Response();
+            $response->setCustomStatusCode($e->getCode() ?: -1);
+            $response->setContent($this->jsonSerializer->serialize($data));
         }
 
         return $response;

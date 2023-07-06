@@ -49,6 +49,8 @@ class Config extends AbstractHelper
     const ORDER_SEND_IMMEDIATELY            = 'deck_commerce_sales/order/send_immediately';
     const ORDER_USE_PAYMENT_METHODS_MAPPING = 'deck_commerce_sales/order/use_payment_methods_mapping';
     const ORDER_PAYMENT_METHODS_MAPPING     = 'deck_commerce_sales/order/payment_methods_mapping';
+    const ORDER_USE_RETAIL_DELIVERY_TAX     = 'deck_commerce_sales/order/use_retail_delivery_tax';
+    const ORDER_RETAIL_DELIVERY_TAX_AMOUNT  = 'deck_commerce_sales/order/retail_delivery_tax_amount';
     const ORDER_DEBUG                       = 'deck_commerce_sales/order/debug';
 
     const ORDER_HISTORY_ENABLED        = 'deck_commerce_sales/order_history/enabled';
@@ -339,6 +341,32 @@ class Config extends AbstractHelper
         }
 
         return trim($this->getConfigValue(self::ORDER_PAYMENT_METHODS_MAPPING, $scopeType));
+    }
+
+    /**
+     * Setting that determines if need to use Colorado Retail Delivery Tax calculation
+     *
+     * @param string $scopeType
+     * @return bool
+     */
+    public function useDeliveryTax($scopeType = ScopeInterface::SCOPE_STORE)
+    {
+        return $this->scopeConfig->isSetFlag(self::ORDER_USE_RETAIL_DELIVERY_TAX, $scopeType);
+    }
+
+    /**
+     * Get Colorado Retail Delivery Tax calculation value (0.27 by default)
+     *
+     * @param string $scopeType
+     * @return string
+     */
+    public function getDeliveryTaxAmount($scopeType = ScopeInterface::SCOPE_STORE)
+    {
+        if (!$this->useDeliveryTax($scopeType)) {
+            return 0;
+        }
+
+        return $this->getConfigValue(self::ORDER_RETAIL_DELIVERY_TAX_AMOUNT, $scopeType);
     }
 
     /**

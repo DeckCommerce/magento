@@ -66,6 +66,12 @@
     <table name="sales_order" resource="default" engine="innodb">
         <column xsi:type="smallint" name="deck_export_status" unsigned="true" nullable="false" default="0"
                 comment="Deck Commerce Order Export Status"/>
+        <column xsi:type="decimal" name="retail_delivery_tax_amount" scale="4" precision="20" unsigned="false" nullable="true"
+                comment="Retail Delivery Tax Amount"/>
+    </table>
+    <table name="quote" resource="default" engine="innodb">
+        <column xsi:type="decimal" name="retail_delivery_tax_amount" scale="4" precision="20" unsigned="false" nullable="true"
+                comment="Retail Delivery Tax Amount"/>
     </table>
     <table name="sales_order_grid">
         <column xsi:type="smallint" name="deck_export_status" unsigned="true" nullable="false" default="0"

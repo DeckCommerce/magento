@@ -8,7 +8,7 @@
 
 namespace DeckCommerce\Integration\Model\Service\Response;
 
-use Zend_Http_Response as Response;
+use Laminas\Http\Response;
 
 /**
  * Service Response ValidatorInterface

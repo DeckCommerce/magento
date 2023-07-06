@@ -144,7 +144,8 @@ class OrderBuilder implements OrderBuilderInterface
         $result =
             (float) $this->getAdjustedMerchandiseNetTotal($order)
             + $order->getTaxAmount()
-            - $order->getShippingTaxAmount();
+            - $order->getShippingTaxAmount()
+            - $this->getRetailDeliveryTaxAmount($order);
 
         return $this->helper->formatPrice($result);
     }
@@ -217,7 +218,10 @@ class OrderBuilder implements OrderBuilderInterface
      */
     protected function getMerchandiseGrossTotal(OrderInterface $order)
     {
-        $result = $order->getSubtotal() + $order->getTaxAmount() - $order->getShippingTaxAmount();
+        $result = $order->getSubtotal()
+            + $order->getTaxAmount()
+            - $order->getShippingTaxAmount()
+            - $this->getRetailDeliveryTaxAmount($order);
 
         return $this->helper->formatPrice($result);
     }
@@ -241,7 +245,9 @@ class OrderBuilder implements OrderBuilderInterface
      */
     protected function getShippingGrossTotal(OrderInterface $order)
     {
-        $result = $order->getShippingAmount() + $order->getShippingTaxAmount();
+        $result = $order->getShippingAmount()
+            + $order->getShippingTaxAmount()
+            + $this->getRetailDeliveryTaxAmount($order);
 
         return $this->helper->formatPrice($result);
     }
@@ -254,9 +260,23 @@ class OrderBuilder implements OrderBuilderInterface
      */
     protected function getAdjustedShippingGrossTotal(OrderInterface $order)
     {
-        $result = $order->getShippingAmount() + $order->getShippingTaxAmount() - $order->getShippingDiscountAmount();
+        $result = $order->getShippingAmount()
+            + $order->getShippingTaxAmount()
+            + $this->getRetailDeliveryTaxAmount($order)
+            - $order->getShippingDiscountAmount();
 
         return $this->helper->formatPrice($result);
+    }
+
+    /**
+     * Get Colorado Retail Delivery Tax amount
+     *
+     * @param OrderInterface $order
+     * @return mixed
+     */
+    protected function getRetailDeliveryTaxAmount($order)
+    {
+        return $this->helper->formatPrice($order->getData('retail_delivery_tax_amount'));
     }
 
     /**
@@ -267,12 +287,19 @@ class OrderBuilder implements OrderBuilderInterface
      */
     protected function getTaxes(OrderInterface $order)
     {
-        return [
-            [
-                "TaxType" => "USShippingTotal",
-                "Amount"  => $this->helper->formatPrice($order->getShippingTaxAmount())
-            ]
+        $taxes[] = [
+            "TaxType" => "USShippingTotal",
+            "Amount"  => $this->helper->formatPrice($order->getShippingTaxAmount())
         ];
+
+        if ($order->getData('retail_delivery_tax_amount') > 0) {
+            $taxes[] = [
+                "TaxType" => "RetailDeliveryFee",
+                "Amount"  => $this->getRetailDeliveryTaxAmount($order)
+            ];
+        }
+
+        return $taxes;
     }
 
     /**
