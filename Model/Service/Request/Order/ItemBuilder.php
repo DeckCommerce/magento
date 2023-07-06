@@ -1,7 +1,7 @@
 <?php
 /**
  * @author DeckCommerce Team
- * @copyright Copyright (c) 2020 DeckCommerce (https://www.deckcommerce.com)
+ * @copyright Copyright (c) 2022 DeckCommerce (https://www.deckcommerce.com)
  * @package DeckCommerce_Integration
  */
 
