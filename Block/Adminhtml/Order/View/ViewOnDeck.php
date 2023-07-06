@@ -22,10 +22,6 @@ use Magento\Sales\Model\Config;
  */
 class ViewOnDeck extends View
 {
-    /**
-     * @var UrlInterface
-     */
-    protected $urlBuilder;
 
     /**
      * @var DeckHelper
@@ -56,7 +52,6 @@ class ViewOnDeck extends View
         DeckOrder $deckOrder,
         array $data = []
     ) {
-        $this->urlBuilder = $context->getUrlBuilder();
         $this->helper     = $helper;
         $this->deckOrder  = $deckOrder;
         parent::__construct($context, $registry, $salesConfig, $reorderHelper, $data);
@@ -80,14 +75,13 @@ class ViewOnDeck extends View
             return $this;
         }
 
-        $apiUrl = $this->helper->getWebApiUrl();
-        $deckUrl = str_replace('api', 'app', $apiUrl) . '/OMS/' . $this->getOrder()->getIncrementId();
+        $deckUrl = $this->helper->getDeckCommerceOrderUrl($this->getOrder()->getIncrementId());
         $this->getToolbar()->addChild(
             'deck_order_view',
             Button::class,
             [
                 'label' => __('View on Deck Commerce'),
-                'onclick' => 'setLocation(\'' . $deckUrl . '\')',
+                'onclick' => 'window.open(\'' . $deckUrl . '\')',
                 'class' => 'primary',
                 'sort_order' => 100
             ]
