@@ -75,15 +75,34 @@ class QuantityValidatorObserverPlugin
         HelperData $helper,
         SourceItemsSaveInterface $sourceItemsSaveInterface,
         SearchCriteriaBuilder $searchCriteriaBuilder,
-        SourceItemRepositoryInterface $sourceItemRepository,
-        StockResolverInterface $stockResolver
+        SourceItemRepositoryInterface $sourceItemRepository
     ) {
         $this->inventoryCheck = $inventoryCheck;
         $this->helper         = $helper;
         $this->sourceItemsSaveInterface = $sourceItemsSaveInterface;
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
         $this->sourceItemRepository = $sourceItemRepository;
-        $this->stockResolver        = $stockResolver;
+    }
+
+    /**
+     * Validate if product available for add too cart action
+     *
+     * @param $quoteItem
+     * @param $deckQtys
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    protected function validateOnPdp($quoteItem, $deckQtys)
+    {
+        if ($this->helper->isPdpAddToCartAction()) {
+            $websiteCode = $quoteItem->getStore()->getWebsite()->getCode();
+            $canBackorder = $this->helper->canBackorder($websiteCode, $quoteItem->getSku());
+            $deckQty = array_shift($deckQtys);
+            if ($deckQty < 1 && !$canBackorder) {
+                throw new \Magento\Framework\Exception\LocalizedException(
+                    __('Product that you are trying to add is not available.')
+                );
+            }
+        }
     }
 
     /**
@@ -118,11 +137,12 @@ class QuantityValidatorObserverPlugin
             try {
                 $deckQtys = $this->inventoryCheck->getDeckProductsQtyCached($skus);
                 $this->updateInventory($deckQtys);
-
                 $this->validatedItems = $skus;
             } catch (\Exception $e) {
                 return;
             }
+
+            $this->validateOnPdp($quoteItem, $deckQtys);
         }
     }
 

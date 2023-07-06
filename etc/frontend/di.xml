@@ -42,7 +42,9 @@
         <plugin name="replaceQuoteItems" disabled="true" />
         <plugin name="deckCommerceReplaceQuoteItems" type="DeckCommerce\Integration\Plugin\NegotiableQuote\Sales\Controller\Order\ReorderPlugin" sortOrder="10" disabled="false"/>
     </type>
-
+    <type name="Magento\ConfigurableProduct\Model\Product\Type\Configurable">
+        <plugin name="deck_configurable_product" type="DeckCommerce\Integration\Plugin\Model\ConfigurableProduct\Product\Type\ConfigurablePlugin" />
+    </type>
     <preference for="Magento\Rma\Controller\Returns\Create"
                 type="DeckCommerce\Integration\Controller\Rma\Returns\Create" />
 

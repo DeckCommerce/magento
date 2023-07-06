@@ -250,6 +250,23 @@ class Data extends Config
     }
 
     /**
+     * Check whether current action is 'checkout_cart_add' on PDP
+     *
+     * @return bool
+     */
+    public function isPdpAddToCartAction()
+    {
+        if (!$this->_getRequest()) {
+            return false;
+        }
+        if ($this->isPdpInventoryCheckEnabled() && $this->_getRequest()->getFullActionName() === 'checkout_cart_add') {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * Is inventory check active on current page (PDP, Cart or Checkout)
      *
      * @return bool
@@ -257,7 +274,7 @@ class Data extends Config
     public function isActiveOnCurrentPage()
     {
         $actionName = $this->_getRequest()->getFullActionName();
-        if ($actionName == 'checkout_cart_add' && $this->isPdpInventoryCheckEnabled()) {
+        if ($this->isPdpAddToCartAction()) {
             return true;
         }
 
@@ -340,21 +357,39 @@ class Data extends Config
         // phpcs:ignore Magento2.Functions.DiscouragedFunction
         $result = call_user_func_array([$object, $method], $params);
 
-        //1st parameter is customer ID
-        $customerApiCacheTag = isset($params[0])
-            ? ("DECK_API_{$method}_CUSTOMER_" . $params[0])
-            : "DDECK_API_{$method}_CUSTOMER_0";
-
         if ($cacheLifetime) {
             $this->cache->save(
                 $this->serializer->serialize($result),
                 $cacheId,
-                ['DECK_API', 'DECK_API_' . $method . implode('_', $params), $customerApiCacheTag],
+                $this->_getCacheTags($method, $params),
                 $cacheLifetime
             );
         }
 
         return $result;
+    }
+
+    /**
+     * Get cache tags
+     *
+     * @param string $method
+     * @param array $params
+     * @return string[]
+     */
+    protected function _getCacheTags($method, $params)
+    {
+        $tags = ['DECK_API'];
+        if ($method === 'getApiOrdersHistory') {
+            //1st parameter is customer ID
+            $customerApiCacheTag = isset($params[0])
+                ? ("DECK_API_{$method}_CUSTOMER_" . $params[0])
+                : "DECK_API_{$method}_CUSTOMER_0";
+
+            $tags[] = $customerApiCacheTag;
+            $tags[] = 'DECK_API_' . $method . implode('_', $params);
+        }
+
+        return $tags;
     }
 
     /**

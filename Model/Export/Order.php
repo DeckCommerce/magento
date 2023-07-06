@@ -136,9 +136,10 @@ class Order
             throw new ValidatorException(__('Virtual order can not be exported.'));
         }
 
-        if ($order->getPayment()->getMethodInstance()->isOffline()) {
+        //temporary allow offline order
+        /*if ($order->getPayment()->getMethodInstance()->isOffline()) {
             throw new ValidatorException(__('Order with offline payment can not be exported.'));
-        }
+        }*/
     }
 
     /**
