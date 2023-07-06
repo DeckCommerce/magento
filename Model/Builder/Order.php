@@ -1,7 +1,7 @@
 <?php
 /**
  * @author DeckCommerce Team
- * @copyright Copyright (c) 2022 DeckCommerce (https://www.deckcommerce.com)
+ * @copyright Copyright (c) 2023 DeckCommerce (https://www.deckcommerce.com)
  * @package DeckCommerce_Integration
  */
 
@@ -43,6 +43,7 @@ use Magento\Framework\Serialize\Serializer\Json as JsonSerializer;
  */
 class Order
 {
+
     /**
      * @var DeckHelper
      */
@@ -52,6 +53,21 @@ class Order
      * @var OrderFactory
      */
     protected $orderFactory;
+
+    /**
+     * @var AddressFactory
+     */
+    protected $addressFactory;
+
+    /**
+     * @var PaymentFactory
+     */
+    protected $paymentFactory;
+
+    /**
+     * @var ItemFactory
+     */
+    protected $itemFactory;
 
     /**
      * @var StoreManagerInterface
@@ -712,8 +728,8 @@ class Order
      * @param SalesOrder $order
      * @param Shipment $shipment
      * @param array $shipmentData
-     * @param DeckDataCollection $shipTracksCollection
-     * @param DeckDataCollection $orderTracksCollection
+     * @param Collection $shipTracksCollection
+     * @param Collection $orderTracksCollection
      */
     protected function buildShipmentItemsAndTracks(
         $order,

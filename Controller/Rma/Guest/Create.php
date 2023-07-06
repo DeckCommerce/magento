@@ -1,7 +1,7 @@
 <?php
 /**
  * @author DeckCommerce Team
- * @copyright Copyright (c) 2022 DeckCommerce (https://www.deckcommerce.com)
+ * @copyright Copyright (c) 2023 DeckCommerce (https://www.deckcommerce.com)
  * @package DeckCommerce_Integration
  */
 
@@ -81,8 +81,9 @@ class Create extends \Magento\Rma\Controller\Guest\Create implements HttpPostAct
     }
 
     /**
-     * @return \Magento\Framework\App\ResponseInterface|\Magento\Framework\Controller\Result\Redirect|\Magento\Framework\Controller\ResultInterface
+     * @return \Magento\Framework\App\ResponseInterface|\Magento\Framework\Controller\Result\Redirect|\Magento\Framework\Controller\ResultInterface|void
      * @throws \Magento\Framework\Exception\InputException
+     * @throws \Magento\Framework\Exception\NotFoundException
      * @throws \Magento\Framework\Stdlib\Cookie\CookieSizeLimitReachedException
      * @throws \Magento\Framework\Stdlib\Cookie\FailureToSendException
      */

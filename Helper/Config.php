@@ -1,7 +1,7 @@
 <?php
 /**
  * @author DeckCommerce Team
- * @copyright Copyright (c) 2022 DeckCommerce (https://www.deckcommerce.com)
+ * @copyright Copyright (c) 2023 DeckCommerce (https://www.deckcommerce.com)
  * @package DeckCommerce_Integration
  */
 
@@ -197,7 +197,7 @@ class Config extends AbstractHelper
     }
 
     /**
-     * Is check inventory on checkout pages page enabled
+     * Is check inventory on checkout page enabled
      *
      * @param string $scopeType
      * @return bool

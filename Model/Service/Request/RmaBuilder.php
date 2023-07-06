@@ -1,7 +1,7 @@
 <?php
 /**
  * @author DeckCommerce Team
- * @copyright Copyright (c) 2022 DeckCommerce (https://www.deckcommerce.com)
+ * @copyright Copyright (c) 2023 DeckCommerce (https://www.deckcommerce.com)
  * @package DeckCommerce_Integration
  */
 
@@ -36,7 +36,7 @@ class RmaBuilder implements RmaBuilderInterface
      *
      * @param string $orderId
      * @param string $rmaNumber
-     * @param array $items
+     * @param array $rmaItems
      * @return array
      */
     public function build($orderId, $rmaNumber, $rmaItems)

@@ -2,7 +2,7 @@
 <!--
 /**
  * @author DeckCommerce Team
- * @copyright Copyright (c) 2022 DeckCommerce (https://www.deckcommerce.com)
+ * @copyright Copyright (c) 2023 DeckCommerce (https://www.deckcommerce.com)
  * @package DeckCommerce_Integration
  */
 -->
@@ -293,7 +293,7 @@
                         <field id="enabled">1</field>
                         <field id="send_immediately">0</field>
                     </depends>
-                    <comment>Frequency of automatic orders export. Allows to export already placed orders independently from checkout process. Used if "Send Order Immediately" setting is disabled.</comment>
+                    <comment>Frequency of automatic orders export. Allows to export already placed orders independently of checkout process. Used if "Send Order Immediately" setting is disabled.</comment>
                 </field>
                 <field id="use_payment_methods_mapping" translate="label" type="select" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Use Payment Methods Mapping</label>

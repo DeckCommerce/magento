@@ -1,7 +1,7 @@
 <?php
 /**
  * @author DeckCommerce Team
- * @copyright Copyright (c) 2022 DeckCommerce (https://www.deckcommerce.com)
+ * @copyright Copyright (c) 2023 DeckCommerce (https://www.deckcommerce.com)
  * @package DeckCommerce_Integration
  */
 
@@ -37,7 +37,6 @@ class NumberGenerator
      *
      * @param DeckHelper $helper
      * @param HttpClient $httpClient
-     * @param InventoryCheckBuilderInterface $inventoryCheckBuilder
      */
     public function __construct(
         DeckHelper $helper,
