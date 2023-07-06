@@ -1,13 +1,13 @@
 <?php
 /**
  * @author DeckCommerce Team
- * @copyright Copyright (c) 2023 DeckCommerce (https://www.deckcommerce.com)
+ * @copyright Copyright (c) 2020 DeckCommerce (https://www.deckcommerce.com)
  * @package DeckCommerce_Integration
  */
 
 namespace DeckCommerce\Integration\Model\Service\Response;
 
-use Laminas\Http\Response;
+use Zend_Http_Response as Response;
 
 /**
  * Response Validator
@@ -109,7 +109,7 @@ class Validator implements ValidatorInterface
      */
     public function validate(Response $response)
     {
-        if (!isset($this->successResponseCodes[$response->getStatusCode()])) {
+        if (!isset($this->successResponseCodes[$response->getStatus()])) {
             $this->addErrorMessage($this->prepareErrorMessage($response));
 
             return false;
@@ -126,7 +126,7 @@ class Validator implements ValidatorInterface
      */
     protected function prepareErrorMessage($response)
     {
-        $responseCode = $response->getStatusCode();
+        $responseCode = $response->getStatus();
         $responseBody = $response->getBody();
         if (isset($this->failedResponseCodes[$responseCode])) {
             return sprintf($this->failedResponseCodes[$responseCode], $responseBody);

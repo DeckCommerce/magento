@@ -1,7 +1,7 @@
 <?php
 /**
  * @author DeckCommerce Team
- * @copyright Copyright (c) 2023 DeckCommerce (https://www.deckcommerce.com)
+ * @copyright Copyright (c) 2020 DeckCommerce (https://www.deckcommerce.com)
  * @package DeckCommerce_Integration
  */
 
@@ -41,9 +41,9 @@ class DataPlugin
      */
     public function afterIsMultishippingCheckoutAvailable(MultishippingHelper $subject, $result)
     {
-        /*if ($this->helper->isEnabled()) {
+        if ($this->helper->isEnabled()) {
             return false;
-        }*/
+        }
 
         return $result;
     }

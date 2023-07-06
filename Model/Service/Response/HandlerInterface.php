@@ -2,7 +2,7 @@
 
 namespace DeckCommerce\Integration\Model\Service\Response;
 
-use Laminas\Http\Response;
+use Zend_Http_Response as Response;
 use DeckCommerce\Integration\Model\Service\Exception\WebapiException;
 
 /**

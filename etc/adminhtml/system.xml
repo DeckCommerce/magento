@@ -2,7 +2,7 @@
 <!--
 /**
  * @author DeckCommerce Team
- * @copyright Copyright (c) 2023 DeckCommerce (https://www.deckcommerce.com)
+ * @copyright Copyright (c) 2020 DeckCommerce (https://www.deckcommerce.com)
  * @package DeckCommerce_Integration
  */
 -->
@@ -293,55 +293,9 @@
                         <field id="enabled">1</field>
                         <field id="send_immediately">0</field>
                     </depends>
-                    <comment>Frequency of automatic orders export. Allows to export already placed orders independently of checkout process. Used if "Send Order Immediately" setting is disabled.</comment>
+                    <comment>Frequency of automatic orders export. Allows to export already placed orders independently from checkout process. Used if "Send Order Immediately" setting is disabled.</comment>
                 </field>
-                <field id="use_payment_methods_mapping" translate="label" type="select" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Use Payment Methods Mapping</label>
-                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    <depends>
-                        <field id="enabled">1</field>
-                    </depends>
-                </field>
-                <field id="payment_methods_mapping" translate="label" type="textarea" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Payment Methods Mapping JSON</label>
-                    <backend_model>DeckCommerce\Integration\Model\Config\Backend\PaymentMethodsMapping</backend_model>
-                    <depends>
-                        <field id="use_payment_methods_mapping">1</field>
-                    </depends>
-                    <comment><![CDATA[ Allows to specify custom mapping for payment methods. Example:
-    {
-        "cybersource": {
-            "PaymentProcessorSubTypeName": "CreditCard",
-            "Generic1": "CreditCard",
-            "Generic2": "@payment_token",
-            "Generic4": "config:general/store_information/name"
-        },
-        "amazonpay": {
-            "PaymentProcessorSubTypeName": "AmazonPay",
-            "Generic1": "Amazon Pay",
-            "Generic2": "payment:additional_info:charge_permission_id",
-            "CapturedAmount": "order:total_paid"
-        }
-    }
-    ]]>
-                    </comment>
-                </field>
-                <field id="use_retail_delivery_tax" translate="label" type="select" sortOrder="85" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Use Retail Delivery Tax</label>
-                    <comment>WARNING: Once is setting is enabled the Colorado Retail Delivery Tax Amount will be added to the existing tax on checkout (if Shipping Address State is Colorado).</comment>
-                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    <depends>
-                        <field id="enabled">1</field>
-                    </depends>
-                </field>
-                <field id="retail_delivery_tax_amount" translate="label" type="text" sortOrder="87" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Retail Delivery Tax Amount</label>
-                    <comment>Colorado Retail Delivery Tax Amount. "0.27" value is set by default. It will be added to the existing order tax amount</comment>
-                    <depends>
-                        <field id="use_retail_delivery_tax">1</field>
-                    </depends>
-                </field>
-                <field id="debug" translate="label" type="select" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="debug" translate="label" type="select" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Debug Mode</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <depends>

@@ -1,7 +1,7 @@
 <?php
 /**
  * @author DeckCommerce Team
- * @copyright Copyright (c) 2023 DeckCommerce (https://www.deckcommerce.com)
+ * @copyright Copyright (c) 2020 DeckCommerce (https://www.deckcommerce.com)
  * @package DeckCommerce_Integration
  */
 
@@ -9,7 +9,7 @@ namespace DeckCommerce\Integration\Model\Service\Response;
 
 use DeckCommerce\Integration\Model\Service\Exception\WebapiException;
 use Magento\Framework\Serialize\Serializer\Json;
-use Laminas\Http\Response;
+use Zend_Http_Response as Response;
 
 /**
  * Response Handler
@@ -45,7 +45,7 @@ class Handler implements HandlerInterface
      */
     public function handle(Response $response)
     {
-        $responseBody = $response->getBody();
+        $responseBody = (string)$response->getBody();
 
         try {
             $decodedResponseBody = $this->jsonSerializer->unserialize($responseBody);

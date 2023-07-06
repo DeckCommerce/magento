@@ -2,7 +2,7 @@
 <!--
 /**
  * @author DeckCommerce Team
- * @copyright Copyright (c) 2023 DeckCommerce (https://www.deckcommerce.com)
+ * @copyright Copyright (c) 2020 DeckCommerce (https://www.deckcommerce.com)
  * @package DeckCommerce_Integration
  */
 -->
@@ -34,7 +34,6 @@
                 <default_method>GROUND</default_method>
                 <send_immediately>1</send_immediately>
                 <cron_schedule>*/5 * * * *</cron_schedule>
-                <retail_delivery_tax_amount>0.27</retail_delivery_tax_amount>
             </order>
             <order_history>
                 <api_name>api/OmsOrderHistory</api_name>

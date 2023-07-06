@@ -1,7 +1,7 @@
 <?php
 /**
  * @author DeckCommerce Team
- * @copyright Copyright (c) 2023 DeckCommerce (https://www.deckcommerce.com)
+ * @copyright Copyright (c) 2020 DeckCommerce (https://www.deckcommerce.com)
  * @package DeckCommerce_Integration
  */
 
@@ -30,9 +30,7 @@ class DataPlugin
 
     /**
      * DataPlugin constructor.
-     *
      * @param HelperData $helper
-     * @param Registry $coreRegistry
      */
     public function __construct(
         HelperData $helper,
@@ -45,10 +43,10 @@ class DataPlugin
     /**
      * Checks for ability to create RMA
      *
-     * @param RmaHelper $subject
+     * RmaHelper $subject
      * @param callable $proceed
-     * @param int|Order $order
-     * @param bool $forceCreate - set yes when you don't need to check config setting (for admin side)
+     * @param  int|Order $order
+     * @param  bool $forceCreate - set yes when you don't need to check config setting (for admin side)
      * @return bool
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */

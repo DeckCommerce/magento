@@ -1,7 +1,7 @@
 <?php
 /**
  * @author DeckCommerce Team
- * @copyright Copyright (c) 2023 DeckCommerce (https://www.deckcommerce.com)
+ * @copyright Copyright (c) 2020 DeckCommerce (https://www.deckcommerce.com)
  * @package DeckCommerce_Integration
  */
 
@@ -194,8 +194,8 @@ abstract class AbstractInventory
      */
     protected function runImport($stockItems)
     {
-        foreach (array_chunk($stockItems, self::IMPORT_CHUNK_SIZE) as $chunk) {
-            $this->importAppend->execute($chunk);
+        foreach (array_chunk($stockItems, self::IMPORT_CHUNK_SIZE) as $shunk) {
+            $this->importAppend->execute($shunk);
         }
     }
 
@@ -397,7 +397,7 @@ abstract class AbstractInventory
     {
         try {
             if (!$this->canRun()) {
-                $logMsg = "Unable to start import because other import is running";
+                $logMsg = "Unable to start import because other import is runnning";
                 $this->addToLog($logMsg, false, true, '', InventoryLog::STATUS_FAILED);
                 return false;
             }

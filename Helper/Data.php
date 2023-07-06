@@ -1,7 +1,7 @@
 <?php
 /**
  * @author DeckCommerce Team
- * @copyright Copyright (c) 2023 DeckCommerce (https://www.deckcommerce.com)
+ * @copyright Copyright (c) 2020 DeckCommerce (https://www.deckcommerce.com)
  * @package DeckCommerce_Integration
  */
 
@@ -124,7 +124,6 @@ class Data extends Config
      * @param DeckLogger $deckLogger
      * @param Json $jsonSerializer
      * @param AttributeRepositoryInterface $attributeRepositoryInterface
-     * @param ModuleManager $moduleManager
      * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
     public function __construct(
@@ -142,6 +141,7 @@ class Data extends Config
         Json $jsonSerializer,
         AttributeRepositoryInterface $attributeRepositoryInterface,
         ModuleManager $moduleManager
+
     ) {
         $this->cache                        = $cache;
         $this->serializer                   = $serializer;
@@ -250,23 +250,6 @@ class Data extends Config
     }
 
     /**
-     * Check whether current action is 'checkout_cart_add' on PDP
-     *
-     * @return bool
-     */
-    public function isPdpAddToCartAction()
-    {
-        if (!$this->_getRequest()) {
-            return false;
-        }
-        if ($this->isPdpInventoryCheckEnabled() && $this->_getRequest()->getFullActionName() === 'checkout_cart_add') {
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
      * Is inventory check active on current page (PDP, Cart or Checkout)
      *
      * @return bool
@@ -274,7 +257,7 @@ class Data extends Config
     public function isActiveOnCurrentPage()
     {
         $actionName = $this->_getRequest()->getFullActionName();
-        if ($this->isPdpAddToCartAction()) {
+        if ($actionName == 'checkout_cart_add' && $this->isPdpInventoryCheckEnabled()) {
             return true;
         }
 
@@ -357,39 +340,21 @@ class Data extends Config
         // phpcs:ignore Magento2.Functions.DiscouragedFunction
         $result = call_user_func_array([$object, $method], $params);
 
+        //1st parameter is customer ID
+        $customerApiCacheTag = isset($params[0])
+            ? ("DECK_API_{$method}_CUSTOMER_" . $params[0])
+            : "DDECK_API_{$method}_CUSTOMER_0";
+
         if ($cacheLifetime) {
             $this->cache->save(
                 $this->serializer->serialize($result),
                 $cacheId,
-                $this->_getCacheTags($method, $params),
+                ['DECK_API', 'DECK_API_' . $method . implode('_', $params), $customerApiCacheTag],
                 $cacheLifetime
             );
         }
 
         return $result;
-    }
-
-    /**
-     * Get cache tags
-     *
-     * @param string $method
-     * @param array $params
-     * @return string[]
-     */
-    protected function _getCacheTags($method, $params)
-    {
-        $tags = ['DECK_API'];
-        if ($method === 'getApiOrdersHistory') {
-            //1st parameter is customer ID
-            $customerApiCacheTag = isset($params[0])
-                ? ("DECK_API_{$method}_CUSTOMER_" . $params[0])
-                : "DECK_API_{$method}_CUSTOMER_0";
-
-            $tags[] = $customerApiCacheTag;
-            $tags[] = 'DECK_API_' . $method . implode('_', $params);
-        }
-
-        return $tags;
     }
 
     /**
@@ -572,7 +537,7 @@ class Data extends Config
     }
 
     /**
-     * Json serialize message if it's not a string
+     * Json serialize message it it's not a string
      *
      * @param mixed $message
      * @return bool|string
@@ -594,16 +559,15 @@ class Data extends Config
      *
      * @param string $title
      * @param mixed $message
-     * @return void
+     * @return bool
      */
     public function addInventoryLog($title, $message)
     {
         if (!$this->useInventoryCheckDebug()) {
-            return;
+            return false;
         }
         $message = "==> INVENTORY CHECK: {$title}\n" . $this->getSerializeLogMessage($message);
-
-        $this->deckLogger->info($message);
+        return $this->deckLogger->info($message);
     }
 
     /**
@@ -611,16 +575,16 @@ class Data extends Config
      *
      * @param string $title
      * @param mixed $message
-     * @return void
+     * @return bool
      */
     public function addOrderExportLog($title, $message)
     {
         if (!$this->useOrderExportDebug()) {
-            return;
+            return false;
         }
         $message = "==> ORDER EXPORT: {$title}\n" . $this->getSerializeLogMessage($message);
 
-        $this->deckLogger->info($message);
+        return $this->deckLogger->info($message);
     }
 
     /**
@@ -629,19 +593,19 @@ class Data extends Config
      * @param string $title
      * @param mixed $message
      * @param false $isCancel
-     * @return void
+     * @return bool
      */
     public function addRmaExportLog($title, $message, $isCancel = false)
     {
         if (!$this->useRmaExportDebug()) {
-            return;
+            return false;
         }
 
         $action = $isCancel ? 'CANCEL' : 'EXPORT';
 
         $message = "==> RMA {$action}: {$title}\n" . $this->getSerializeLogMessage($message);
 
-        $this->deckLogger->info($message);
+        return $this->deckLogger->info($message);
     }
 
     /**
@@ -649,16 +613,15 @@ class Data extends Config
      *
      * @param string $title
      * @param mixed $message
-     * @return void
+     * @return bool
      */
     public function addOrderHistoryLog($title, $message)
     {
         if (!$this->useOrderHistoryDebug()) {
-            return;
+            return false;
         }
         $message = "==> ORDER HISTORY: {$title}\n" . $this->getSerializeLogMessage($message);
-
-        $this->deckLogger->info($message);
+        return $this->deckLogger->info($message);
     }
 
     /**
@@ -715,36 +678,5 @@ class Data extends Config
     public function isRmaModuleEnabled()
     {
         return $this->_moduleManager->isEnabled('Magento_Rma');
-    }
-
-    /**
-     * Get json unserialized order payment methods mapping
-     *
-     * @param string $scopeType
-     * @return mixed|array|bool|int|float|string|null
-     */
-    public function getPaymentMethodsMapping($scopeType = ScopeInterface::SCOPE_STORE)
-    {
-        $mappingJson = $this->getPaymentMethodsMappingJson($scopeType);
-        if ($mappingJson) {
-            $mapping = $this->jsonDecode($mappingJson);
-            if (is_array($mapping)) {
-                return $mapping;
-            }
-        }
-
-        return [];
-    }
-
-    /**
-     * Get DeckCommerce application order URL by the Magento order increment ID
-     *
-     * @param string $orderIncrementId
-     * @return string
-     */
-    public function getDeckCommerceOrderUrl($orderIncrementId)
-    {
-        $apiUrl = $this->getWebApiUrl();
-        return str_replace('api', 'app', $apiUrl) . '/OMS/' . $orderIncrementId;
     }
 }

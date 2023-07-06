@@ -1,7 +1,7 @@
 <?php
 /**
  * @author DeckCommerce Team
- * @copyright Copyright (c) 2023 DeckCommerce (https://www.deckcommerce.com)
+ * @copyright Copyright (c) 2021 DeckCommerce (https://www.deckcommerce.com)
  * @package DeckCommerce_Integration
  */
 
@@ -75,7 +75,6 @@ class Create extends \Magento\Rma\Controller\Returns\Create implements HttpPostA
 
     /**
      * @return \Magento\Framework\App\ResponseInterface|\Magento\Framework\Controller\ResultInterface|void
-     * @throws \Magento\Framework\Exception\NotFoundException
      */
     public function execute()
     {

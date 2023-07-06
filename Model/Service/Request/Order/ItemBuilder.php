@@ -1,7 +1,7 @@
 <?php
 /**
  * @author DeckCommerce Team
- * @copyright Copyright (c) 2023 DeckCommerce (https://www.deckcommerce.com)
+ * @copyright Copyright (c) 2020 DeckCommerce (https://www.deckcommerce.com)
  * @package DeckCommerce_Integration
  */
 
@@ -62,10 +62,9 @@ class ItemBuilder
 
     /**
      * ItemBuilder constructor.
-     *
      * @param DeckHelper $helper
      * @param Calculation $calculationTool
-     * @param GiftMessageHelper $giftMessageHelper
+     * @param GiftMessageHelper $giftMessage
      * @param GetStockItemConfigurationInterface $getStockItemConfiguration
      */
     public function __construct(
@@ -151,12 +150,12 @@ class ItemBuilder
         }
 
         if (empty($result)) {
-            $size = $this->getAttributeText($product, 'size');
+            $size = $product->getAttributeText('size');
             if ($size) {
                 $result["Custom{$customNumber}"] = sprintf('%s: %s', 'Size', $size);
                 $customNumber++;
             }
-            $color = $this->getAttributeText($product, 'color');
+            $color = $product->getAttributeText('color');
             if ($color) {
                 $result["Custom{$customNumber}"] = sprintf('%s: %s', 'Color', $color);
             }
@@ -202,22 +201,6 @@ class ItemBuilder
     }
 
     /**
-     * Get product attribute option value
-     *
-     * @param Product $product
-     * @param string $attributeCode
-     * @return string
-     */
-    protected function getAttributeText($product, $attributeCode)
-    {
-        if ($product->getData($attributeCode)) {
-            return $product->getAttributeText($attributeCode);
-        }
-
-        return '';
-    }
-
-    /**
      * Prepare order items, split by quantity.
      * Each item has quantity = 1
      *
@@ -242,7 +225,7 @@ class ItemBuilder
             "ImageURL"            => $this->getImageUrl($product),
             "MSRP"                => $this->getMsrp($product),
             "StyleNumber"         => $productName,
-            "ProductSize"         => $this->getAttributeText($product, 'size'),
+            "ProductSize"         => $product->getAttributeText('size') ?: "",
             "GiftMessage"         => $this->getGiftMessage($orderItem),
             "UnlimitedBackorder"  => $this->canBackorder($orderItem),
             "ShippingReferenceID" => 0,

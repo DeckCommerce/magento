@@ -101,8 +101,6 @@ class ReorderPlugin
      * @param OrderRepositoryInterface $orderRepository
      * @param AddressRepositoryInterface $addressRepository
      * @param \Psr\Log\LoggerInterface $logger
-     * @param \Magento\Sales\Model\OrderFactory $salesOrderFactory
-     * @param HelperData $helper
      * @param Reorder|null $reorder
      * @param ProductCollectionFactory|null $productCollectionFactory
      */

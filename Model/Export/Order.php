@@ -1,7 +1,7 @@
 <?php
 /**
  * @author DeckCommerce Team
- * @copyright Copyright (c) 2023 DeckCommerce (https://www.deckcommerce.com)
+ * @copyright Copyright (c) 2020 DeckCommerce (https://www.deckcommerce.com)
  * @package DeckCommerce_Integration
  */
 
@@ -136,10 +136,9 @@ class Order
             throw new ValidatorException(__('Virtual order can not be exported.'));
         }
 
-        //temporary allow offline order
-        /*if ($order->getPayment()->getMethodInstance()->isOffline()) {
+        if ($order->getPayment()->getMethodInstance()->isOffline()) {
             throw new ValidatorException(__('Order with offline payment can not be exported.'));
-        }*/
+        }
     }
 
     /**
