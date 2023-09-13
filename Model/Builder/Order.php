@@ -753,7 +753,7 @@ class Order
     }
 
     /**
-     * Get Deck Commerce Shipping method
+     * Get Deck Commerce Shipping method.
      * Shipping method on order or shipment level may differ from the shipping method on order item level
      * So it's used the shipping method on order item level as prioritized
      * and if it's not set then use shipping method of shipment level

@@ -280,7 +280,10 @@
                 <field id="send_immediately" translate="label" type="select" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Send Order Immediately</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    <comment>Setting to export order immediately after order placement. Otherwise, pending order can be sent via cron or manually from the order page.</comment>
+                    <comment>Setting to export order immediately after order placement.
+                        Otherwise, pending order can be sent via cron or manually from the order page.
+                        Note: this setting should be set to "No" if Kount is used as far as it works only with orders that are exported by cron.
+                    </comment>
                     <depends>
                         <field id="enabled">1</field>
                     </depends>
@@ -294,6 +297,15 @@
                         <field id="send_immediately">0</field>
                     </depends>
                     <comment>Frequency of automatic orders export. Allows to export already placed orders independently of checkout process. Used if "Send Order Immediately" setting is disabled.</comment>
+                </field>
+                <field id="excluded_order_states" translate="label" type="multiselect" sortOrder="65" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Do Not Export Orders With States</label>
+                    <source_model>DeckCommerce\Integration\Model\Config\Source\OrderState</source_model>
+                    <depends>
+                        <field id="enabled">1</field>
+                        <field id="send_immediately">0</field>
+                    </depends>
+                    <comment>Order states list to exclude order from the export by cron. Default: Canceled, Closed, Complete, On Hold</comment>
                 </field>
                 <field id="use_payment_methods_mapping" translate="label" type="select" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Use Payment Methods Mapping</label>

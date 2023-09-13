@@ -11,6 +11,7 @@ use DeckCommerce\Integration\Helper\Data as DeckHelper;
 use DeckCommerce\Integration\Model\Export\Order as DeckOrder;
 use DeckCommerce\Integration\Model\Service\Request\Order\ItemBuilder;
 use DeckCommerce\Integration\Model\Service\Request\Order\PaymentBuilder;
+use DeckCommerce\Integration\Model\KountOrderRisFactory;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Model\Order;
 
@@ -39,6 +40,11 @@ class OrderBuilder implements OrderBuilderInterface
     protected $paymentBuilder;
 
     /**
+     * @var KountOrderRisFactory
+     */
+    protected $kountOrderRisFactory;
+
+    /**
      * OrderBuilder constructor.
      *
      * @param DeckHelper $helper
@@ -48,11 +54,13 @@ class OrderBuilder implements OrderBuilderInterface
     public function __construct(
         DeckHelper $helper,
         ItemBuilder $itemBuilder,
-        PaymentBuilder $paymentBuilder
+        PaymentBuilder $paymentBuilder,
+        KountOrderRisFactory $kountOrderRisFactory
     ) {
-        $this->helper         = $helper;
-        $this->itemBuilder    = $itemBuilder;
-        $this->paymentBuilder = $paymentBuilder;
+        $this->helper               = $helper;
+        $this->itemBuilder          = $itemBuilder;
+        $this->paymentBuilder       = $paymentBuilder;
+        $this->kountOrderRisFactory = $kountOrderRisFactory;
     }
 
     /**
@@ -89,7 +97,7 @@ class OrderBuilder implements OrderBuilderInterface
             "AdjustedShippingGrossTotal" => $this->getAdjustedShippingGrossTotal($order),
 
             "GiftCards"        => null,
-            "CustomAttributes" => [],
+            "CustomAttributes" => $this->getCustomAttributes($order),
 
             "OrderTaxes" => $this->getTaxes($order),
 
@@ -347,5 +355,38 @@ class OrderBuilder implements OrderBuilderInterface
             "CompanyName" => $address->getCompany(),
             "Suffix"      => $address->getSuffix()
         ];
+    }
+
+    /**
+     * Get Custom Attributes with Kount Fraud rate data
+     *
+     * @param $order
+     * @return array
+     */
+    public function getCustomAttributes($order)
+    {
+        if ($this->helper->isKountModuleEnabled()) {
+            try {
+
+                $kountOrderRisModel = $this->kountOrderRisFactory->create();
+                if (is_null($kountOrderRisModel)) {
+                    return [];
+                }
+
+                $kountOrderRis = $kountOrderRisModel->getRis($order);
+                if ($kountOrderRis->getRisId()) {
+                    return [
+                        "kountRiskScore"     => $kountOrderRis->getScore(),
+                        "kountRuleDetails"   => str_replace("\n", "|", trim($kountOrderRis->getRule())),
+                        "kountTransactionId" => $kountOrderRis->getTransactionId(),
+                        "kountState"         => $kountOrderRis->getResponse(),
+                    ];
+                }
+            } catch (\Exception $e) {
+
+            }
+        }
+
+        return [];
     }
 }

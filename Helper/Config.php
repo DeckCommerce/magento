@@ -47,6 +47,7 @@ class Config extends AbstractHelper
     const ORDER_DEFAULT_METHOD              = 'deck_commerce_sales/order/default_method';
     const ORDER_UPC_ATTRIBUTE_CODE          = 'deck_commerce_sales/order/upc_attribute';
     const ORDER_SEND_IMMEDIATELY            = 'deck_commerce_sales/order/send_immediately';
+    const ORDER_EXCLUDED_STATES             = 'deck_commerce_sales/order/excluded_order_states';
     const ORDER_USE_PAYMENT_METHODS_MAPPING = 'deck_commerce_sales/order/use_payment_methods_mapping';
     const ORDER_PAYMENT_METHODS_MAPPING     = 'deck_commerce_sales/order/payment_methods_mapping';
     const ORDER_USE_RETAIL_DELIVERY_TAX     = 'deck_commerce_sales/order/use_retail_delivery_tax';
@@ -315,6 +316,22 @@ class Config extends AbstractHelper
             self::ORDER_SEND_IMMEDIATELY,
             $scopeType
         );
+    }
+
+    /**
+     * Get order states list that used to exclude the order with such state from the export
+     *
+     * @param string $scopeType
+     * @return array
+     */
+    public function getExcludedOrderStates($scopeType = ScopeInterface::SCOPE_STORE)
+    {
+        $excludedStates = $this->getConfigValue(self::ORDER_EXCLUDED_STATES, $scopeType);
+        if ($excludedStates) {
+            return explode(',', $excludedStates);
+        }
+
+        return [];
     }
 
     /**

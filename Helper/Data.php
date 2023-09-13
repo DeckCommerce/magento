@@ -708,13 +708,35 @@ class Data extends Config
     }
 
     /**
+     * Check if module installed/enabled
+     *
+     * @return bool
+     */
+    public function isModuleEnabled($moduleName)
+    {
+        return $this->_moduleManager->isEnabled($moduleName);
+    }
+
+    /**
      * Check if RMA module installed/enabled
      *
      * @return bool
      */
     public function isRmaModuleEnabled()
     {
-        return $this->_moduleManager->isEnabled('Magento_Rma');
+        return $this->isModuleEnabled('Magento_Rma');
+    }
+
+    /**
+     * Check if Kount_Kount module installed/enabled
+     *
+     * @return bool
+     */
+    public function isKountModuleEnabled()
+    {
+        return
+            $this->isModuleEnabled('Kount_Kount')
+            && $this->scopeConfig->isSetFlag('kount/account/enabled', ScopeInterface::SCOPE_STORE);
     }
 
     /**

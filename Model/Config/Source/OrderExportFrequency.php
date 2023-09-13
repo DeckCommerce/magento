@@ -27,6 +27,10 @@ class OrderExportFrequency implements \Magento\Framework\Option\ArrayInterface
         if (!self::$_options) {
             self::$_options = [
                 [
+                    'label' => __('Every 2 minutes'),
+                    'value' => 2,
+                ],
+                [
                     'label' => __('Every 5 minutes'),
                     'value' => 5,
                 ],

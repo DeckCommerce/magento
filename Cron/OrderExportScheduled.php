@@ -57,15 +57,14 @@ class OrderExportScheduled
     public function execute()
     {
         if ($this->helper->isOrderExportEnabled()) {
+
+            $excludingStatuses = $this->helper->getExcludedOrderStates();
+
             $collection = $this->orderCollectionFactory->create();
-            $collection
-                ->addFieldToFilter(DeckOrder::EXPORT_STATUS, ['eq' => DeckOrder::STATUS_PENDING])
-                ->addFieldToFilter('state', ['nin' => [
-                    Order::STATE_COMPLETE,
-                    Order::STATE_CLOSED,
-                    Order::STATE_CANCELED,
-                    Order::STATE_HOLDED
-                ]]);
+            $collection->addFieldToFilter(DeckOrder::EXPORT_STATUS, ['eq' => DeckOrder::STATUS_PENDING]);
+            if (!empty($excludingStatuses)) {
+                $collection->addFieldToFilter('state', ['nin' => $excludingStatuses]);
+            }
 
             $processedIds = [];
             $failedIds = [];
