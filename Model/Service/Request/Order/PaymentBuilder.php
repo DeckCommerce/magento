@@ -123,8 +123,8 @@ class PaymentBuilder
         $orderPayment = $order->getPayment();
 
         $data = [];
-        if ($orderPayment->getAmountAuthorized() > 0 || $orderPayment->getAmountPaid() > 0) {
-            $data[] = $this->getMainOrderPayment($orderPayment);
+        if ($this->getAuthorizedAmount($orderPayment) > 0 || $orderPayment->getAmountPaid() > 0) {
+            $data[] = $this->getMainOrderPayment($order);
         }
 
         $storeCreditPaymentData = $this->getStoreCreditPayment($order->getBaseCustomerBalanceAmount());
@@ -143,17 +143,19 @@ class PaymentBuilder
     /**
      * Get main order payment data
      *
-     * @param OrderPaymentInterface $orderPayment
+     * @param OrderInterface $order
      * @return array
      */
-    protected function getMainOrderPayment(OrderPaymentInterface $orderPayment)
+    protected function getMainOrderPayment(OrderInterface $order)
     {
+        $orderPayment = $order->getPayment();
+
         $data = [
             "PaymentProcessorSubTypeName" => $this->getPaymentSubTypeName($orderPayment),
             "Generic1"                    => $this->getPaymentMethod($orderPayment),
             "Generic4"                    => "",
             "Generic5"                    => "",
-            "AuthorizedAmount"            => $this->helper->formatPrice($this->getAuthorizedAmount($orderPayment)),
+            "AuthorizedAmount"            => $this->helper->formatPrice($this->getAuthorizedAmount($orderPayment))
         ];
 
         if ($orderPayment->getMethod() === 'amazon_payment') {
@@ -164,6 +166,15 @@ class PaymentBuilder
             $data["CreditCard"]   = null;
             $data["Generic2"]     = '';
             $data["Generic3"]     = '';
+        } elseif ($orderPayment->getMethod() == 'verifone' || $orderPayment->getMethod() == 'verifone_hosted') {
+            $data["PaymentToken"]  = (string) $order->getData('ext_order_id');
+            $data["CreditCard"]    = $this->getCcLast4($orderPayment);
+            $data["EarlyCapture"]  = false;
+            $data["Generic1"]      = $this->getVerifoneToken($orderPayment);
+            $data["Generic2"]      = $this->getPaymentMethod($orderPayment);
+            $data["Generic3"]      = $this->getExprDate($orderPayment);
+            $data["CapturedAmount"] = $this->helper->formatPrice($order->getBaseGrandTotal());
+            $data["CreditedAmount"] = $this->helper->formatPrice($order->getBaseGrandTotal());
         } else {
             $data["PaymentToken"] = $this->getPaymentToken($orderPayment);
             $data["Generic2"]     = $this->getCcLast4($orderPayment);
@@ -188,51 +199,74 @@ class PaymentBuilder
     {
         $paymentMethodsMapping = $this->helper->getPaymentMethodsMapping();
         if ($paymentMethodsMapping && isset($paymentMethodsMapping[$orderPayment->getMethod()])) {
-
-            $order = $orderPayment->getOrder();
             $paymentMethodsMappingFields = $paymentMethodsMapping[$orderPayment->getMethod()];
-            foreach ($paymentMethodsMappingFields as $mappingFieldName => $mappingFieldValue) {
-                if (is_array($mappingFieldValue)) {
-                    continue;
-                }
+            $defaultMappingData = $this->processMappingFields($defaultMappingData, $paymentMethodsMappingFields, $orderPayment);
+        }
 
-                $orderFieldValue = $this->processObjectTypeField(
-                    $order, self::MAPPING_ORDER_FIELD_PREFIX, $mappingFieldValue
+        return $defaultMappingData;
+    }
+
+    /**
+     * Replace mapping fields with necessary values
+     *
+     * @param array $defaultMappingData
+     * @param array $paymentMethodsMappingFields
+     * @param OrderPaymentInterface $orderPayment
+     * @return mixed
+     */
+    protected function processMappingFields($defaultMappingData, $paymentMethodsMappingFields, $orderPayment)
+    {
+        $order = $orderPayment->getOrder();
+
+        foreach ($paymentMethodsMappingFields as $mappingFieldName => $mappingFieldValue) {
+            if ($mappingFieldName === "OrderTransactions" && is_array($mappingFieldValue)) {
+                $defaultMappingData["OrderTransactions"][0] = $this->processMappingFields(
+                    $defaultMappingData["OrderTransactions"][0],
+                    $paymentMethodsMappingFields["OrderTransactions"],
+                    $orderPayment
                 );
-                if (!is_null($orderFieldValue)) {
-                    $defaultMappingData[$mappingFieldName] = $orderFieldValue;
-                    continue;
-                }
-
-                $paymentAdditionalInfoValue = $this->processObjectTypeField(
-                    $orderPayment, self::MAPPING_PAYMENT_ADDITIONAL_INFO_PREFIX, $mappingFieldValue
-                );
-                if (!is_null($paymentAdditionalInfoValue)) {
-                    $defaultMappingData[$mappingFieldName] = $paymentAdditionalInfoValue;
-                    continue;
-                }
-
-                $paymentFieldValue = $this->processObjectTypeField(
-                    $orderPayment, self::MAPPING_PAYMENT_FIELD_PREFIX, $mappingFieldValue
-                );
-                if (!is_null($paymentFieldValue)) {
-                    $defaultMappingData[$mappingFieldName] = $paymentFieldValue;
-                    continue;
-                }
-
-                $configValue = $this->processConfigField($mappingFieldValue);
-                if (!is_null($configValue)) {
-                    $defaultMappingData[$mappingFieldName] = $configValue;
-                    continue;
-                }
-                $customVariableValue = $this->processCustomMappingVariables($orderPayment, $mappingFieldValue);
-                if (!is_null($customVariableValue)) {
-                    $defaultMappingData[$mappingFieldName] = $customVariableValue;
-                    continue;
-                }
-
-                $defaultMappingData[$mappingFieldName] = $mappingFieldValue;
             }
+
+            if (is_array($mappingFieldValue)) {
+                continue;
+            }
+
+            $orderFieldValue = $this->processObjectTypeField(
+                $order, self::MAPPING_ORDER_FIELD_PREFIX, $mappingFieldValue
+            );
+            if (!is_null($orderFieldValue)) {
+                $defaultMappingData[$mappingFieldName] = $orderFieldValue;
+                continue;
+            }
+
+            $paymentAdditionalInfoValue = $this->processObjectTypeField(
+                $orderPayment, self::MAPPING_PAYMENT_ADDITIONAL_INFO_PREFIX, $mappingFieldValue
+            );
+            if (!is_null($paymentAdditionalInfoValue)) {
+                $defaultMappingData[$mappingFieldName] = $paymentAdditionalInfoValue;
+                continue;
+            }
+
+            $paymentFieldValue = $this->processObjectTypeField(
+                $orderPayment, self::MAPPING_PAYMENT_FIELD_PREFIX, $mappingFieldValue
+            );
+            if (!is_null($paymentFieldValue)) {
+                $defaultMappingData[$mappingFieldName] = $paymentFieldValue;
+                continue;
+            }
+
+            $configValue = $this->processConfigField($mappingFieldValue);
+            if (!is_null($configValue)) {
+                $defaultMappingData[$mappingFieldName] = $configValue;
+                continue;
+            }
+            $customVariableValue = $this->processCustomMappingVariables($orderPayment, $mappingFieldValue);
+            if (!is_null($customVariableValue)) {
+                $defaultMappingData[$mappingFieldName] = $customVariableValue;
+                continue;
+            }
+
+            $defaultMappingData[$mappingFieldName] = $mappingFieldValue;
         }
 
         return $defaultMappingData;
@@ -386,6 +420,10 @@ class PaymentBuilder
             case 'ebay':
                 $paymentTypeName = 'eBay';
                 break;
+            case 'verifone':
+            case 'verifone_hosted':
+                $paymentTypeName = 'Verifone';
+                break;
             case 'giftcardaccount':
                 $paymentTypeName = 'GiftCard';
                 break;
@@ -423,6 +461,25 @@ class PaymentBuilder
         }
 
         return $orderPayment->getMethod();
+    }
+
+    /**
+     * Get Verifone token
+     *
+     * @param OrderPaymentInterface $orderPayment
+     * @return string
+     */
+    protected function getVerifoneToken(OrderPaymentInterface $orderPayment)
+    {
+        $additionalInformation = $orderPayment->getAdditionalInformation();
+        if (is_array($additionalInformation)
+            && isset($additionalInformation['reuse_token'])
+            && $additionalInformation['reuse_token']
+        ) {
+            return $additionalInformation['reuse_token'];
+        }
+
+        return "";
     }
 
     /**

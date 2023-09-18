@@ -34,7 +34,8 @@ class PaymentMethodsMapping extends \Magento\Framework\App\Config\Value
         'CreditedAmount',
         'PaymentToken',
         'CreditCard',
-        'EarlyCapture'
+        'EarlyCapture',
+        'OrderTransactions'
     ];
 
     /**
@@ -89,7 +90,7 @@ class PaymentMethodsMapping extends \Magento\Framework\App\Config\Value
                             __("Mapped value for {$key} can't be an object.")
                         );
                     }
-                    if (is_array($value)) {
+                    if (is_array($value) && $key !== "OrderTransactions") {
                         throw new \Magento\Framework\Exception\LocalizedException(
                             __("Mapped value for {$key} can't be an array.")
                         );
