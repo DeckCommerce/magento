@@ -25,11 +25,15 @@ class Config extends AbstractHelper
     const INVENTORY_ENABLED              = 'deck_commerce_inventory/inventory_check/enabled';
     const INVENTORY_API_NAME             = 'deck_commerce_inventory/inventory_check/api_name';
     const INVENTORY_FEED_NAME            = 'deck_commerce_inventory/inventory_check/feed_name';
+    const INVENTORY_MSI_ENABLED          = 'deck_commerce_inventory/inventory_check/msi_enabled';
     const INVENTORY_CHECK_PDP            = 'deck_commerce_inventory/inventory_check/check_inventory_on_pdp';
     const INVENTORY_CHECK_CART           = 'deck_commerce_inventory/inventory_check/check_inventory_on_cart';
     const INVENTORY_CHECK_CHECKOUT       = 'deck_commerce_inventory/inventory_check/check_inventory_on_checkout';
     const INVENTORY_CHECK_CACHE_LIFETIME = 'deck_commerce_inventory/inventory_check/cache_lifetime';
     const INVENTORY_CHECK_DEBUG          = 'deck_commerce_inventory/inventory_check/debug';
+
+    const MULTIPLE_SOURCE_INVENTORY_ENABLED = 'deck_commerce_inventory/multiple_source_inventory/enabled';
+    const MULTIPLE_SOURCE_INVENTORY_MAPPING = 'deck_commerce_inventory/multiple_source_inventory/source_mapping';
 
     const INVENTORY_TYPE_FULL                 = 'full';
     const INVENTORY_TYPE_DELTA                = 'delta';
@@ -167,6 +171,31 @@ class Config extends AbstractHelper
             self::INVENTORY_ENABLED,
             $scopeType
         );
+    }
+
+    /**
+     * Is Multiple Source Mode inventory enabled
+     *
+     * @param string $scopeType
+     * @return bool
+     */
+    public function isMultipleSourceInventoryEnabled($scopeType = ScopeInterface::SCOPE_STORE)
+    {
+        return $this->isEnabled($scopeType) && $this->scopeConfig->isSetFlag(
+                self::MULTIPLE_SOURCE_INVENTORY_ENABLED,
+                $scopeType
+            );
+    }
+
+    /**
+     * Get Multiple Source Inventory Source/DC Warehouse mapping in JSON format
+     *
+     * @param string $scopeType
+     * @return mixed
+     */
+    public function getMsiMappingJson($scopeType = ScopeInterface::SCOPE_STORE)
+    {
+        return $this->getConfigValue(self::MULTIPLE_SOURCE_INVENTORY_MAPPING, $scopeType);
     }
 
     /**

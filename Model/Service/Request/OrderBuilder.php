@@ -13,7 +13,6 @@ use DeckCommerce\Integration\Model\Service\Request\Order\ItemBuilder;
 use DeckCommerce\Integration\Model\Service\Request\Order\PaymentBuilder;
 use DeckCommerce\Integration\Model\KountOrderRisFactory;
 use Magento\Sales\Api\Data\OrderInterface;
-use Magento\Sales\Model\Order;
 
 /**
  * OrderBuilder model

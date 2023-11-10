@@ -160,15 +160,18 @@ class QuantityValidatorObserverPlugin
         }
 
         $skus = array_keys($deckQtys);
-        $sourceCode = $this->helper->getInventorySourceCode();
 
-        $sourceItems = $this->getSourceItemsBySkus($skus, $sourceCode);
+        $deckComSourceCodes = $this->getDeckCommerceSourceCodes($deckQtys);
+        $magentoSourceCodes = $this->helper->convertDeckComToMagentoSourceCodes($deckComSourceCodes);
+
+        $sourceItems = $this->getSourceItemsBySkus($skus, $magentoSourceCodes);
         $updatedSourceItems = [];
         foreach ($sourceItems as $sourceItemId => $sourceItem) {
-            if (!isset($deckQtys[$sourceItem->getSku()])) {
+            $dcSourceCode = $this->helper->getDeckComSourceByMagentoSource($sourceItem->getSourceCode());
+            if (!$dcSourceCode || !isset($deckQtys[$sourceItem->getSku()][$dcSourceCode])) {
                 continue;
             }
-            $deckProductQty = $deckQtys[$sourceItem->getSku()];
+            $deckProductQty = $deckQtys[$sourceItem->getSku()][$dcSourceCode];
             if ($sourceItem->getQuantity() != $deckProductQty) {
                 $sourceItem->setQuantity($deckProductQty);
                 $sourceItem->setStatus(1);
@@ -182,17 +185,28 @@ class QuantityValidatorObserverPlugin
     }
 
     /**
-     * Load source items by skus
+     * Get DeckComemrce Source (Warehouse) codes for all SKUs from the returned API array
+     *
+     * @param $deckQtys
+     * @return array
+     */
+    protected function getDeckCommerceSourceCodes($deckQtys)
+    {
+        return array_unique(array_merge(...array_values(array_map('array_keys', $deckQtys))));
+    }
+
+    /**
+     * Load source items by skus and source codes
      *
      * @param array $productSkus
-     * @param null $sourceCode
+     * @param array $sourceCode
      * @return SourceItemInterface|SourceItemInterface[]|null
      */
-    public function getSourceItemsBySkus($productSkus, $sourceCode = null)
+    public function getSourceItemsBySkus($productSkus, $sourceCodes)
     {
         $searchCriteria = $this->searchCriteriaBuilder
             ->addFilter(SourceItemInterface::SKU, [$productSkus], 'in')
-            ->addFilter(SourceItemInterface::SOURCE_CODE, $sourceCode)
+            ->addFilter(SourceItemInterface::SOURCE_CODE, $sourceCodes, 'in')
             ->create();
 
         return $this->sourceItemRepository->getList($searchCriteria)->getItems();

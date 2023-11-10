@@ -6,6 +6,7 @@ It has the following features:
 
 - Allows to import inventory from the Deck Commerce side to Magento (full and delta inventory import)
 - Check inventory on-the-fly on the product, cart and checkout pages
+- Support of the Multiple Sources Inventory
 - Export Magento order to the Deck Commerce
 - Support of Kount fraud protection extension: kount/magento2-kount
 - Show the Deck Commerce orders, shipments and returns information in the Magento customer’s account in real time.
@@ -40,7 +41,7 @@ It has the following features:
 
 
 ## Requirements
-  * Magento Enterprise (or Cloud) Edition 2.3.x-2.4.x
+  * Magento Enterprise (or Cloud) Edition 2.4.x-2.6.x
 
 ## Configuration in Admin Panel
 

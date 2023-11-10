@@ -105,6 +105,11 @@ class Data extends Config
     protected $methodsMap = null;
 
     /**
+     * @var null | array
+     */
+    protected $inventorySourcesMap = null;
+
+    /**
      * @var ModuleManager|null
      */
     protected $moduleManager = null;
@@ -604,6 +609,98 @@ class Data extends Config
         $message = "==> INVENTORY CHECK: {$title}\n" . $this->getSerializeLogMessage($message);
 
         $this->deckLogger->info($message);
+    }
+
+    /**
+     * Get json unserialized multiple source inventory mapping values
+     *
+     * @param string $scopeType
+     * @return mixed|array|bool|int|float|string|null
+     */
+    public function getMultipleSourceInventoryMapping($scopeType = ScopeInterface::SCOPE_STORE)
+    {
+        if (!is_null($this->inventorySourcesMap)) {
+            return $this->inventorySourcesMap;
+        }
+
+        $this->inventorySourcesMap = [];
+        $mappingJson = $this->getMsiMappingJson($scopeType);
+        if ($mappingJson) {
+            $mapping = $this->jsonDecode($mappingJson);
+            if (is_array($mapping)) {
+                $this->inventorySourcesMap = array_column(
+                    $mapping, 'magento_source', 'dc_warehouse');
+            }
+        }
+
+        return $this->inventorySourcesMap;
+    }
+
+    /**
+     * Get Deck Commerce Source (Warehouse) Code by Magento inventory Source Code
+     *
+     * If MSI is disabled then Deck Commerce Source code is equal to Magento inventory source code
+     *
+     * @param $magentoMsiSourceCode
+     * @return false|int|string
+     */
+    public function getDeckComSourceByMagentoSource($magentoMsiSourceCode)
+    {
+        if (!$this->isMultipleSourceInventoryEnabled()) {
+            return $magentoMsiSourceCode;
+        }
+
+        $msiSourceCodesMapping = $this->getMultipleSourceInventoryMapping();
+        return array_search($magentoMsiSourceCode, $msiSourceCodesMapping);
+    }
+
+    /**
+     * Get Magento inventory Source Code by Deck Commerce Source (Warehouse) Code
+     *
+     * If MSI is disabled then the "default" source is returned
+     *
+     * @param string $magentoMsiSourceCode
+     * @return false|int|string
+     */
+    public function getMagentoSourceByDeckComSource($deckComSourceCode)
+    {
+        if (!$this->isMultipleSourceInventoryEnabled() || empty($deckComSourceCode)) {
+            return $this->getInventorySourceCode();
+        }
+
+        return $this->getMultipleSourceInventoryMapping()[$deckComSourceCode] ?? $this->getInventorySourceCode();
+    }
+
+    /**
+     * Convert Deck Commerce Warehouse Codes to Magento Source Codes like:
+     *
+     * $deckCommerceSourceCodes = [
+     *    'USStore4',
+     *    'DCC',
+     *    'DCSL'
+     * ];
+     *
+     * $msiSourceCodesMapping = [
+     *     'DCC'  => 'default',
+     *     'DCSL' => 'test_source1'
+     * ];
+     *
+     * $result = ['default', 'test_source1']
+     *
+     * In case if MSI is disabled the only one "default" source is used and there is nothing to convent
+     *
+     * @param array $msiSourceCodesMapping
+     * @param array $deckCommerceSourceCode
+     * @return array
+     */
+    public function convertDeckComToMagentoSourceCodes($deckCommerceSourceCodes)
+    {
+        if (!$this->isMultipleSourceInventoryEnabled()) {
+            return $deckCommerceSourceCodes;
+        }
+
+        $msiSourceCodesMapping = $this->getMultipleSourceInventoryMapping();
+        return array_values(array_intersect_key($msiSourceCodesMapping, array_flip($deckCommerceSourceCodes)));
     }
 
     /**

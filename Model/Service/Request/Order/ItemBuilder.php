@@ -25,8 +25,11 @@ use Magento\GiftMessage\Helper\Message as GiftMessageHelper;
  */
 class ItemBuilder
 {
-    const TAX_TYPE                 = "USSalesTotal";
-    const ADJUSTMENT_ITEM_DISCOUNT = "ItemDiscount";
+    const TAX_TYPE                  = "USSalesTotal";
+    const ADJUSTMENT_ITEM_DISCOUNT  = "ItemDiscount";
+
+    const DELIVERY_TYPE_OMNI_PICKUP = "2";
+    const STORE_PICKUP_METHOD       = "instore_pickup";
 
     /**
      * @var DeckHelper
@@ -222,9 +225,10 @@ class ItemBuilder
      * Each item has quantity = 1
      *
      * @param Item $orderItem
+     * @param string $warehouseCode
      * @return string[]
      */
-    protected function getOrderItemsByQty($orderItem)
+    protected function getOrderItemsByQty($orderItem, $warehouseCode)
     {
         $orderItems = [];
 
@@ -259,6 +263,11 @@ class ItemBuilder
             "Custom4"  => "",
             "Custom5"  => "",
         ];
+
+        if (!empty($warehouseCode)) {
+            $itemData["WarehouseCode"] = $warehouseCode;
+            $itemData["DeliveryType"]  = self::DELIVERY_TYPE_OMNI_PICKUP;
+        }
 
         $optionsData = $this->getProductOptionsData($product, $orderItem);
         $itemData = array_merge($itemData, $optionsData);
@@ -468,23 +477,46 @@ class ItemBuilder
      */
     protected function getOrderItems(OrderInterface $order)
     {
+        $warehouseCode = $this->getInStorePickupWarehouseCode($order);
+
         $orderItems = [];
         /** @var Item $orderItem */
         foreach ($order->getAllVisibleItems() as $orderItem) {
             if ($orderItem->getProductType() === Type::TYPE_BUNDLE && $orderItem->getHasChildren()) {
                 foreach ($orderItem->getChildrenItems() as $childItem) {
                     $childItem->setAppliedRuleIds($orderItem->getAppliedRuleIds());
-                    $orderItems[] = $this->getOrderItemsByQty($childItem);
+                    $orderItems[] = $this->getOrderItemsByQty($childItem, $warehouseCode);
                 }
                 continue;
             }
 
-            $orderItems[] = $this->getOrderItemsByQty($orderItem);
+            $orderItems[] = $this->getOrderItemsByQty($orderItem, $warehouseCode);
         }
 
         // phpcs:ignore Magento2.Functions.DiscouragedFunction
         $orderItems = call_user_func_array('array_merge', $orderItems);
 
         return $orderItems;
+    }
+
+    /**
+     * Get Order Pickup Location Code if shipping method is "In-Store Pickup Delivery"
+     *
+     * @param OrderInterface $order
+     * @return mixed|string
+     */
+    protected function getInStorePickupWarehouseCode($order)
+    {
+        if ($order->getShippingMethod() == self::STORE_PICKUP_METHOD) {
+            $extensionAttributes = $order->getExtensionAttributes();
+            if ($extensionAttributes) {
+                $pickupLocationCode = $extensionAttributes->getPickupLocationCode();
+                if ($pickupLocationCode) {
+                    return $this->helper->getDeckComSourceByMagentoSource($pickupLocationCode);
+                }
+            }
+        }
+
+        return "";
     }
 }

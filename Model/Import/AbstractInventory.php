@@ -84,8 +84,9 @@ abstract class AbstractInventory
      * @var string[]
      */
     protected $fieldsMapping = [
-        'sku'       => 'SKU',
-        'quantity'  => 'Quantity'
+        'source_code' => 'WarehouseCode',
+        'sku'         => 'Sku',
+        'quantity'    => 'Quantity'
     ];
 
     protected $logData = [];
@@ -149,6 +150,10 @@ abstract class AbstractInventory
         foreach ($rows as $i => $row) {
             $row = explode("\t", $row);
             if (!$i) {
+                $k = array_search('SKU', $row);
+                if ($k !== false) {
+                    $row[$k] = $this->fieldsMapping['sku']; //backward compatibility for old SKU field name
+                }
                 $header = $row;
                 continue;
             }
@@ -174,6 +179,10 @@ abstract class AbstractInventory
         $itemData = array_combine($header, $row);
 
         $item['source_code'] = $this->helper->getInventorySourceCode();
+        if (isset($itemData[$this->fieldsMapping['source_code']])) {
+            $item['source_code'] = $this->helper
+                ->getMagentoSourceByDeckComSource($itemData[$this->fieldsMapping['source_code']]);
+        }
         $item['sku']         = $itemData[$this->fieldsMapping['sku']];
         $item['quantity']    = $itemData[$this->fieldsMapping['quantity']];
 
@@ -214,7 +223,7 @@ abstract class AbstractInventory
 
     /**
      * Check whether other imports are running now and block new import
-     * Added possibility to switch "progress" status to "failed" automatically for possible stuck imports
+     * Added opportunity to switch "progress" status to "failed" automatically for possible stuck imports
      * if they're older than MAX_PROGRESS_TIME
      *
      * @return bool

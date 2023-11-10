@@ -113,6 +113,27 @@
                     <comment>Log API requests and responses to /var/log/deck_commerce.log</comment>
                 </field>
             </group>
+            <group id="multiple_source_inventory" translate="label" type="text" sortOrder="15" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Multiple Source Inventory Settings</label>
+                <field id="enabled" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Activate Magento Multiple Source Inventory to store product quantity on different inventory sources.
+                        If this setting is set to "No", the only "default" source will be used.
+                        Note: there is Magento MSI Source / Deck Commerce Warehouse Mapping should be configured to activate this feature.</comment>
+                </field>
+                <field id="source_mapping" translate="label" sortOrder="45" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>MSI Source/Warehouse Mapping</label>
+                    <frontend_model>DeckCommerce\Integration\Block\Adminhtml\Form\Field\InventorySource</frontend_model>
+                    <backend_model>DeckCommerce\Integration\Model\Config\Backend\InventorySourceMapping</backend_model>
+                    <comment>Mapping between Magento Inventory Source and Deck Commerce Warehouse.
+                        Note: the only configured Warehouse Codes will be handled by the Deck Commerce.
+                        If the mapping for any Magento inventory source is not configured, it will be ignored from processing.</comment>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                </field>
+            </group>
             <group id="full_inventory_import" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Full Inventory Import Settings</label>
                 <field id="enabled" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">

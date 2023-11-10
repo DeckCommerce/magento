@@ -106,10 +106,58 @@ class InventoryCheck
 
         $qtys = null;
         if ($qtyData && isset($qtyData['Items']) && !empty($qtyData['Items'])) {
-            $items = $qtyData['Items'];
-            foreach ($items as $item) {
-                if ($item && isset($item['TotalAvailableQuantity'])) {
-                    $qtys[$item['DeckSKU']] = $item['TotalAvailableQuantity'];
+            if (!$this->helper->isMultipleSourceInventoryEnabled()) {
+                $qtys = $this->processSingleSourceInventory($qtyData);
+            } else {
+                $qtys = $this->processMultipleSourceInventory($qtyData);
+            }
+        }
+
+        return $qtys;
+    }
+
+    /**
+     * Process single inventory
+     *
+     * @param array $qtyData
+     * @return array
+     */
+    protected function processSingleSourceInventory($qtyData)
+    {
+        $qtys = null;
+        foreach ($qtyData['Items'] as $item) {
+            if ($item && isset($item['TotalAvailableQuantity'])) {
+                $qtys[$item['DeckSKU']][$this->helper->getInventorySourceCode()] = $item['TotalAvailableQuantity'];
+            }
+        }
+
+        return $qtys;
+    }
+
+    /**
+     * Process Multiple source inventory
+     *
+     * @param $qtyData
+     * @return null
+     */
+    protected function processMultipleSourceInventory($qtyData)
+    {
+        $qtys = null;
+        foreach ($qtyData['Items'] as $item) {
+            if ($item && isset($item['TotalAvailableQuantity'])) {
+                $totalAvailableQty = (int) $item['TotalAvailableQuantity'];
+                $sumQty = 0;
+                if (isset($item['Details']) && is_array($item['Details'])) {
+                    foreach ($item['Details'] as $itemSource) {
+                        $sourceAvailableQty = (int) ($itemSource['TotalQuantity'] - $itemSource['InventoryAllocation']);
+                        $qtys[$item['DeckSKU']][$itemSource['WarehouseCode']] = $sourceAvailableQty;
+                        $sumQty += $sourceAvailableQty;
+                    }
+                }
+
+                if ($totalAvailableQty != $sumQty) {
+                    $this->helper->addInventoryLog('MSI Warning:',
+                        "TotalAvailableQty is not equal to SumQty: " . $totalAvailableQty . ' | ' . $sumQty);
                 }
             }
         }
