@@ -56,7 +56,8 @@ class OrderExportScheduled
      */
     public function execute()
     {
-        if ($this->helper->isOrderExportEnabled()) {
+        $exportEnabledStoreIds = $this->helper->getOrderExportEnabledStoreIds();
+        if (!empty($exportEnabledStoreIds)) {
 
             $excludingStatuses = $this->helper->getExcludedOrderStates();
 
@@ -65,6 +66,11 @@ class OrderExportScheduled
             if (!empty($excludingStatuses)) {
                 $collection->addFieldToFilter('state', ['nin' => $excludingStatuses]);
             }
+
+            $collection->addFieldToFilter('store_id', ['in' => $exportEnabledStoreIds]);
+            $collection->setOrder('entity_id', $collection::SORT_ORDER_ASC);
+            $collection->setPageSize(10);
+            $collection->setCurPage(1);
 
             $processedIds = [];
             $failedIds = [];

@@ -92,12 +92,14 @@ class Config extends AbstractHelper
      * Is DeckCommerce_Integration extension functionality enabled
      *
      * @param string $scopeType
+     * @param int|string|null $scopeCode
+     *
      * @return bool
      */
-    public function isEnabled($scopeType = ScopeInterface::SCOPE_STORE)
+    public function isEnabled($scopeType = ScopeInterface::SCOPE_STORE, $scopeCode = null)
     {
         return
-            $this->scopeConfig->isSetFlag(self::CONFIG_IS_ENABLED, $scopeType)
+            $this->scopeConfig->isSetFlag(self::CONFIG_IS_ENABLED, $scopeType, $scopeCode)
             && !empty($this->getSiteApiKey($scopeType))
             && !empty($this->getSiteCode($scopeType))
             && !empty($this->getWebApiUrl($scopeType));
@@ -288,11 +290,14 @@ class Config extends AbstractHelper
      * Is order export to Deck Commerce enabled setting
      *
      * @param string $scopeType
+     * @param int|string|null $scopeCode
      * @return bool
      */
-    public function isOrderExportEnabled($scopeType = ScopeInterface::SCOPE_STORE)
+    public function isOrderExportEnabled($scopeType = ScopeInterface::SCOPE_STORE, $scopeCode = null)
     {
-        return $this->isEnabled($scopeType) && $this->scopeConfig->isSetFlag(self::ORDER_ENABLED, $scopeType);
+        return
+            $this->isEnabled($scopeType, $scopeCode)
+            && $this->scopeConfig->isSetFlag(self::ORDER_ENABLED, $scopeType, $scopeCode);
     }
 
     /**

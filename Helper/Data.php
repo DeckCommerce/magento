@@ -866,4 +866,24 @@ class Data extends Config
         $apiUrl = $this->getWebApiUrl();
         return str_replace('api', 'app', $apiUrl) . '/OMS/' . $orderIncrementId;
     }
+
+    /**
+     * Retrieve all store IDs for which order export is enabled.
+     *
+     * @return array An array of store IDs.
+     */
+    public function getOrderExportEnabledStoreIds()
+    {
+        $enabledStoreIds = [];
+        $stores = $this->storeManager->getStores();
+
+        foreach ($stores as $store) {
+            $isOrderExportEnabled = $this->isOrderExportEnabled(ScopeInterface::SCOPE_STORE, $store->getId());
+            if ($isOrderExportEnabled) {
+                $enabledStoreIds[] = $store->getId();
+            }
+        }
+
+        return $enabledStoreIds;
+    }
 }
