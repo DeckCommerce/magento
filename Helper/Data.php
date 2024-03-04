@@ -183,47 +183,75 @@ class Data extends Config
     }
 
     /**
-     * Get shipping methods map: magento_shipping_method_code => deck_method_name
-     * Example: fedex_FEDEX_2_DAY => FedEx Two Day
+     * Get json unserialized order shipping methods mapping
      *
-     * @return array
+     * @param string $scopeType
+     * @param int|null|string $scopeCode
+     * @return mixed|array|bool|int|float|string|null
      */
-    public function getShippingMethodsMap()
+    public function getCustomShippingMethodsMapping($scopeType = ScopeInterface::SCOPE_STORE, $scopeCode = null)
     {
-        if ($this->methodsMap === null) {
-            $this->methodsMap = [];
-            $collection = $this->methodMapCollectionFactory->create();
-            $collection->addFieldToFilter('is_enabled', 1);
-            foreach ($collection as $mapItem) {
-                $this->methodsMap[$mapItem->getMethod()] = $mapItem->getDeckMethodName();
+        $mappingJson = $this->getShippingMethodsMappingJson($scopeType, $scopeCode);
+        if ($mappingJson) {
+            $mapping = $this->jsonDecode($mappingJson);
+            if (is_array($mapping)) {
+                return array_column($mapping, 'dc_shipping_method', 'magento_shipping_method');
             }
         }
 
-        return $this->methodsMap;
+        return [];
+    }
+
+    /**
+     * Get shipping methods map: magento_shipping_method_code => deck_method_name
+     * Example: fedex_FEDEX_2_DAY => FedEx Two Day
+     *
+     * @param int $storeId
+     * @return array
+     */
+    public function getShippingMethodsMap($storeId)
+    {
+        if ($this->methodsMap === null || !isset($this->methodsMap[$storeId])) {
+            $this->methodsMap[$storeId] = [];
+            $collection = $this->methodMapCollectionFactory->create();
+            $collection->addFieldToFilter('is_enabled', 1);
+            foreach ($collection as $mapItem) {
+                $this->methodsMap[$storeId][$mapItem->getMethod()] = $mapItem->getDeckMethodName();
+            }
+
+            $customMethodsMap = $this->getCustomShippingMethodsMapping(ScopeInterface::SCOPE_STORE, $storeId);
+            $this->methodsMap[$storeId] = array_merge($this->methodsMap[$storeId], $customMethodsMap);
+        }
+
+        return $this->methodsMap[$storeId];
     }
 
     /**
      * Get Magento mapped shipping method code by Deck Commerce shipping method
      *
      * @param string $deckShippingMethod
+     * @param int $storeId
      * @return false|int|string
      */
-    public function getMappedShippingMethod($deckShippingMethod)
+    public function getMappedShippingMethod($deckShippingMethod, $storeId)
     {
-        return array_search($deckShippingMethod, $this->getShippingMethodsMap());
+        return array_search($deckShippingMethod, $this->getShippingMethodsMap($storeId));
     }
 
     /**
      * Get Deck Commerce shipping method by Magento shipping method (to be used in Order export)
      * If Deck Commerce method can't be found in the mapping table then the default shipping method will be used
      *
-     * @param string $magentoShippingMethod
-     * @param string $scopeType
+     * @param OrderInterface $order
      * @return mixed|string
      */
-    public function getMappedDeckShippingMethod($magentoShippingMethod, $scopeType = ScopeInterface::SCOPE_STORE)
+    public function getMappedDeckShippingMethod($order)
     {
-        return $this->getShippingMethodsMap()[$magentoShippingMethod] ?? $this->getDefaultShippingMethod($scopeType);
+        $magentoShippingMethod = $order->getShippingMethod();
+        $storeId = $order->getStoreId();
+
+        return $this->getShippingMethodsMap($storeId)[$magentoShippingMethod]
+            ?? $this->getDefaultShippingMethod(ScopeInterface::SCOPE_STORE, $storeId);
     }
 
     /**
@@ -304,7 +332,7 @@ class Data extends Config
     }
 
     /**
-     * Get order locate
+     * Get order locale
      *
      * @param OrderInterface $order
      * @return mixed
@@ -313,7 +341,7 @@ class Data extends Config
     {
         return $this->scopeConfig->getValue(
             DirectoryHelper::XML_PATH_DEFAULT_LOCALE,
-            ScopeConfigInterface::SCOPE_TYPE_DEFAULT,
+            ScopeInterface::SCOPE_STORE,
             $order->getStoreId()
         );
     }
@@ -615,16 +643,17 @@ class Data extends Config
      * Get json unserialized multiple source inventory mapping values
      *
      * @param string $scopeType
+     * @param int|null|string $scopeCode
      * @return mixed|array|bool|int|float|string|null
      */
-    public function getMultipleSourceInventoryMapping($scopeType = ScopeInterface::SCOPE_STORE)
+    public function getMultipleSourceInventoryMapping($scopeType = ScopeInterface::SCOPE_STORE, $scopeCode = null)
     {
         if (!is_null($this->inventorySourcesMap)) {
             return $this->inventorySourcesMap;
         }
 
         $this->inventorySourcesMap = [];
-        $mappingJson = $this->getMsiMappingJson($scopeType);
+        $mappingJson = $this->getMsiMappingJson($scopeType, $scopeCode);
         if ($mappingJson) {
             $mapping = $this->jsonDecode($mappingJson);
             if (is_array($mapping)) {
@@ -642,11 +671,16 @@ class Data extends Config
      * If MSI is disabled then Deck Commerce Source code is equal to Magento inventory source code
      *
      * @param $magentoMsiSourceCode
+     * @param string $scopeType
      * @return false|int|string
      */
-    public function getDeckComSourceByMagentoSource($magentoMsiSourceCode)
-    {
-        if (!$this->isMultipleSourceInventoryEnabled()) {
+    public function getDeckComSourceByMagentoSource(
+        $magentoMsiSourceCode,
+        $scopeType = ScopeInterface::SCOPE_STORE,
+        $scopeCode = null
+    ) {
+
+        if (!$this->isMultipleSourceInventoryEnabled($scopeType, $scopeCode)) {
             return $magentoMsiSourceCode;
         }
 
@@ -827,24 +861,27 @@ class Data extends Config
     /**
      * Check if Kount_Kount module installed/enabled
      *
+     * @param int $storeId
      * @return bool
      */
-    public function isKountModuleEnabled()
+    public function isKountModuleEnabled($storeId)
     {
         return
             $this->isModuleEnabled('Kount_Kount')
-            && $this->scopeConfig->isSetFlag('kount/account/enabled', ScopeInterface::SCOPE_STORE);
+            && $this->scopeConfig
+                ->isSetFlag('kount/account/enabled', ScopeInterface::SCOPE_STORE, $storeId);
     }
 
     /**
      * Get json unserialized order payment methods mapping
      *
      * @param string $scopeType
+     * @param int|null|string $scopeCode
      * @return mixed|array|bool|int|float|string|null
      */
-    public function getPaymentMethodsMapping($scopeType = ScopeInterface::SCOPE_STORE)
+    public function getPaymentMethodsMapping($scopeType = ScopeInterface::SCOPE_STORE, $scopeCode = null)
     {
-        $mappingJson = $this->getPaymentMethodsMappingJson($scopeType);
+        $mappingJson = $this->getPaymentMethodsMappingJson($scopeType, $scopeCode);
         if ($mappingJson) {
             $mapping = $this->jsonDecode($mappingJson);
             if (is_array($mapping)) {

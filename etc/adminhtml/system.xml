@@ -328,7 +328,26 @@
                     </depends>
                     <comment>Order states list to exclude order from the export by cron. Default: Canceled, Closed, Complete, On Hold</comment>
                 </field>
-                <field id="use_payment_methods_mapping" translate="label" type="select" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="use_shipping_methods_mapping" translate="label" type="select" sortOrder="67" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Use Shipping Methods Mapping</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Activate Extended Shipping Methods Mapping that allows using any shipping methods (including custom or dynamically generated).
+                        This is an alternative mapping method to what already exists in the module menu configuration.</comment>
+                </field>
+                <field id="shipping_methods_mapping" translate="label" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Magento / Deck Commerce Shipping Methods Mapping</label>
+                    <frontend_model>DeckCommerce\Integration\Block\Adminhtml\Form\Field\ShippingMethod</frontend_model>
+                    <backend_model>DeckCommerce\Integration\Model\Config\Backend\ShippingMethodMapping</backend_model>
+                    <comment>Extended mapping between Magento and Deck Commerce Shipping Methods.
+                        This is an easier to set up and more flexible way to create a mapping,
+                        but it requires understanding how the shipping methods are stored in the database.
+                        The shipping method format should match values in the "shipping_method" column of the sales_order table e.g. fedex_FEDEX_2_DAY, freeshipping_freeshipping, tablerate_bestway, etc.
+                        Example of mapping values: fedex_FEDEX_2_DAY -> 2nd Day</comment>
+                    <depends>
+                        <field id="use_shipping_methods_mapping">1</field>
+                    </depends>
+                </field>
+                <field id="use_payment_methods_mapping" translate="label" type="select" sortOrder="75" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Use Payment Methods Mapping</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <depends>

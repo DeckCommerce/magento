@@ -56,7 +56,7 @@
         </field>
         <field name="method" formElement="input" sortOrder="20">
             <argument name="data" xsi:type="array">
-                <item name="options" xsi:type="object">Magento\Shipping\Model\Config\Source\Allmethods</item>
+                <item name="options" xsi:type="object">DeckCommerce\Integration\Model\Config\Source\AllShippingMethods</item>
                 <item name="config" xsi:type="array">
                     <item name="source" xsi:type="string">map</item>
                     <item name="dataType" xsi:type="string">text</item>

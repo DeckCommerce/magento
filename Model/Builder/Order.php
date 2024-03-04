@@ -808,7 +808,7 @@ class Order
      */
     protected function buildTrack($shipment, $trackNumber, $deckShippingMethod, $trackId)
     {
-        $methodCode = $this->helper->getMappedShippingMethod($deckShippingMethod);
+        $methodCode = $this->helper->getMappedShippingMethod($deckShippingMethod, $shipment->getStoreId());
         if (!$methodCode) {
             $methodCode = Track::CUSTOM_CARRIER_CODE;
         }

@@ -74,7 +74,7 @@ class OrderBuilder implements OrderBuilderInterface
             "OrderNumber"         => $order->getIncrementId(),
             "CustomerID"          => $order->getCustomerId() ?: DeckOrder::GUEST_CUSTOMER_ID,
             "OrderDateUTC"        => gmdate(self::ORDER_DATE_FORMAT, strtotime($order->getCreatedAt())),
-            "ShippingMethod"      => $this->helper->getMappedDeckShippingMethod($order->getShippingMethod()),
+            "ShippingMethod"      => $this->helper->getMappedDeckShippingMethod($order),
             "OrderSource"         => self::ORDER_SOURCE,
             "CustomerOrderLocale" => $this->helper->getOrderLocale($order),
             "SourceIp"            => $order->getRemoteIp(),
@@ -320,7 +320,7 @@ class OrderBuilder implements OrderBuilderInterface
         $result = [
             "ReferenceID"        => null,
             "DwShipmentNo"       => $order->getShippingAddress() ? $order->getShippingAddress()->getId() : '',
-            "ShippingMethod"     => $this->helper->getMappedDeckShippingMethod($order->getShippingMethod()),
+            "ShippingMethod"     => $this->helper->getMappedDeckShippingMethod($order),
             "NetTotal"           => $this->getShippingNetTotal($order),
             "GrossTotal"         => $this->getShippingGrossTotal($order),
             "AdjustedNetTotal"   => $this->getAdjustedShippingNetTotal($order),
@@ -364,7 +364,7 @@ class OrderBuilder implements OrderBuilderInterface
      */
     public function getCustomAttributes($order)
     {
-        if ($this->helper->isKountModuleEnabled()) {
+        if ($this->helper->isKountModuleEnabled($order->getStoreId())) {
             try {
 
                 $kountOrderRisModel = $this->kountOrderRisFactory->create();

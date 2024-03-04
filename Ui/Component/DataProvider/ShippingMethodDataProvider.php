@@ -67,7 +67,6 @@ class ShippingMethodDataProvider extends \Magento\Ui\DataProvider\AbstractDataPr
         $itemId = $this->_request->getParam(DeckMethod::DECK_METHOD_ID);
 
         if (!empty($itemId)) {
-            /** @var $page \Magento\Cms\Model\Page */
             foreach ($items as $method) {
                 $this->loadedData[$method->getId()]['method'] = $method->getData();
             }

@@ -67,7 +67,6 @@ class ShippingMapDataProvider extends \Magento\Ui\DataProvider\AbstractDataProvi
         $itemId = $this->_request->getParam(MethodMap::MAP_ID);
 
         if (!empty($itemId)) {
-            /** @var $page \Magento\Cms\Model\Page */
             foreach ($items as $map) {
                 $this->loadedData[$map->getId()]['map'] = $map->getData();
             }

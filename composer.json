@@ -2,7 +2,7 @@
     "name": "deckcommerce/integration-module",
     "description": "A Magento 2 Deck Commerce integration module",
     "type": "magento2-module",
-    "version": "2024.1.0",
+    "version": "2024.1.1",
     "license": "proprietary",
     "require": {
         "php": "~8.0.0||~8.1.0||~8.2.0"

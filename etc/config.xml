@@ -36,6 +36,7 @@
                 <cron_schedule>*/5 * * * *</cron_schedule>
                 <excluded_order_states>complete,closed,canceled,holded</excluded_order_states>
                 <retail_delivery_tax_amount>0.27</retail_delivery_tax_amount>
+                <shipping_methods_mapping><![CDATA[{"_1709248304407_407":{"magento_shipping_method":"freeshipping_freeshipping","dc_shipping_method":"Free"},"_1709513600419_419":{"magento_shipping_method":"instore_pickup","dc_shipping_method":"PUP"},"_1709584774209_209":{"magento_shipping_method":"fedex_FEDEX_GROUND","dc_shipping_method":"GND"},"_1709584816276_276":{"magento_shipping_method":"fedex_FEDEX_2_DAY","dc_shipping_method":"2nd"},"_1709584863028_28":{"magento_shipping_method":"fedex_GROUND_HOME_DELIVERY","dc_shipping_method":"RES"}}]]></shipping_methods_mapping>
             </order>
             <order_history>
                 <api_name>api/OmsOrderHistory</api_name>

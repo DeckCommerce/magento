@@ -16,6 +16,7 @@ use Magento\GiftCard\Model\Catalog\Product\Type\Giftcard;
 use Magento\InventoryConfigurationApi\Api\GetStockItemConfigurationInterface;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Model\Order\Item;
+use Magento\Store\Model\ScopeInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Tax\Model\Calculation;
 use Magento\GiftMessage\Helper\Message as GiftMessageHelper;
@@ -233,7 +234,8 @@ class ItemBuilder
         $orderItems = [];
 
         $product = $this->getOrderItemProduct($orderItem);
-        $upcAttributeCode = $this->helper->getOrderItemUpcAttribute();
+        $upcAttributeCode = $this->helper
+            ->getOrderItemUpcAttribute(ScopeInterface::SCOPE_STORE, $orderItem->getStoreId());
         $itemsQty = $orderItem->getQtyOrdered();
 
         // phpcs:ignore Magento2.Functions.DiscouragedFunction
@@ -512,7 +514,8 @@ class ItemBuilder
             if ($extensionAttributes) {
                 $pickupLocationCode = $extensionAttributes->getPickupLocationCode();
                 if ($pickupLocationCode) {
-                    return $this->helper->getDeckComSourceByMagentoSource($pickupLocationCode);
+                    return $this->helper->getDeckComSourceByMagentoSource(
+                        $pickupLocationCode, ScopeInterface::SCOPE_STORE, $order->getStoreId());
                 }
             }
         }

@@ -46,17 +46,19 @@ class Config extends AbstractHelper
     const INVENTORY_IMPORT_HISTORY_DIRECTORY  = 'deck_commerce_inventory/%s_inventory_import/history_directory';
     const INVENTORY_IMPORT_LOGS_LIFETIME      = 'deck_commerce_inventory/%s_inventory_import/logs_lifetime';
 
-    const ORDER_ENABLED                     = 'deck_commerce_sales/order/enabled';
-    const ORDER_API_NAME                    = 'deck_commerce_sales/order/api_name';
-    const ORDER_DEFAULT_METHOD              = 'deck_commerce_sales/order/default_method';
-    const ORDER_UPC_ATTRIBUTE_CODE          = 'deck_commerce_sales/order/upc_attribute';
-    const ORDER_SEND_IMMEDIATELY            = 'deck_commerce_sales/order/send_immediately';
-    const ORDER_EXCLUDED_STATES             = 'deck_commerce_sales/order/excluded_order_states';
-    const ORDER_USE_PAYMENT_METHODS_MAPPING = 'deck_commerce_sales/order/use_payment_methods_mapping';
-    const ORDER_PAYMENT_METHODS_MAPPING     = 'deck_commerce_sales/order/payment_methods_mapping';
-    const ORDER_USE_RETAIL_DELIVERY_TAX     = 'deck_commerce_sales/order/use_retail_delivery_tax';
-    const ORDER_RETAIL_DELIVERY_TAX_AMOUNT  = 'deck_commerce_sales/order/retail_delivery_tax_amount';
-    const ORDER_DEBUG                       = 'deck_commerce_sales/order/debug';
+    const ORDER_ENABLED                      = 'deck_commerce_sales/order/enabled';
+    const ORDER_API_NAME                     = 'deck_commerce_sales/order/api_name';
+    const ORDER_DEFAULT_METHOD               = 'deck_commerce_sales/order/default_method';
+    const ORDER_UPC_ATTRIBUTE_CODE           = 'deck_commerce_sales/order/upc_attribute';
+    const ORDER_SEND_IMMEDIATELY             = 'deck_commerce_sales/order/send_immediately';
+    const ORDER_EXCLUDED_STATES              = 'deck_commerce_sales/order/excluded_order_states';
+    const ORDER_USE_SHIPPING_METHODS_MAPPING = 'deck_commerce_sales/order/use_shipping_methods_mapping';
+    const ORDER_SHIPPING_METHODS_MAPPING     = 'deck_commerce_sales/order/shipping_methods_mapping';
+    const ORDER_USE_PAYMENT_METHODS_MAPPING  = 'deck_commerce_sales/order/use_payment_methods_mapping';
+    const ORDER_PAYMENT_METHODS_MAPPING      = 'deck_commerce_sales/order/payment_methods_mapping';
+    const ORDER_USE_RETAIL_DELIVERY_TAX      = 'deck_commerce_sales/order/use_retail_delivery_tax';
+    const ORDER_RETAIL_DELIVERY_TAX_AMOUNT   = 'deck_commerce_sales/order/retail_delivery_tax_amount';
+    const ORDER_DEBUG                        = 'deck_commerce_sales/order/debug';
 
     const ORDER_HISTORY_ENABLED        = 'deck_commerce_sales/order_history/enabled';
     const ORDER_HISTORY_API_NAME       = 'deck_commerce_sales/order_history/api_name';
@@ -110,43 +112,47 @@ class Config extends AbstractHelper
      *
      * @param string $path
      * @param string $scopeType
+     * @param int|null|string $scopeCode
      */
-    public function getConfigValue($path, $scopeType = ScopeInterface::SCOPE_STORE)
+    public function getConfigValue($path, $scopeType = ScopeInterface::SCOPE_STORE, $scopeCode = null)
     {
-        return $this->scopeConfig->getValue($path, $scopeType);
+        return $this->scopeConfig->getValue($path, $scopeType, $scopeCode);
     }
 
     /**
      * Get Deck Commerce site code setting
      *
      * @param string $scopeType
+     * @param int|null|string $scopeCode
      * @return mixed
      */
-    public function getSiteCode($scopeType = ScopeInterface::SCOPE_STORE)
+    public function getSiteCode($scopeType = ScopeInterface::SCOPE_STORE, $scopeCode = null)
     {
-        return $this->getConfigValue(self::CONFIG_SITE_CODE, $scopeType);
+        return $this->getConfigValue(self::CONFIG_SITE_CODE, $scopeType, $scopeCode);
     }
 
     /**
      * Get Deck Commerce web api url setting
      *
      * @param string $scopeType
+     * @param int|null|string $scopeCode
      * @return mixed
      */
-    public function getWebApiUrl($scopeType = ScopeInterface::SCOPE_STORE)
+    public function getWebApiUrl($scopeType = ScopeInterface::SCOPE_STORE, $scopeCode = null)
     {
-        return rtrim($this->getConfigValue(self::CONFIG_WEB_API_URL, $scopeType), '/');
+        return rtrim($this->getConfigValue(self::CONFIG_WEB_API_URL, $scopeType, $scopeCode), '/');
     }
 
     /**
      * Get Deck Commerce site api url setting
      *
      * @param string $scopeType
+     * @param int|null|string $scopeCode
      * @return string
      */
-    public function getSiteApiKey($scopeType = ScopeInterface::SCOPE_STORE)
+    public function getSiteApiKey($scopeType = ScopeInterface::SCOPE_STORE, $scopeCode = null)
     {
-        $value = $this->getConfigValue(self::CONFIG_SITE_API_KEY, $scopeType);
+        $value = $this->getConfigValue(self::CONFIG_SITE_API_KEY, $scopeType, $scopeCode);
         return $this->encryptor->decrypt($value);
     }
 
@@ -179,13 +185,15 @@ class Config extends AbstractHelper
      * Is Multiple Source Mode inventory enabled
      *
      * @param string $scopeType
+     * @param int|null|string $scopeCode
      * @return bool
      */
-    public function isMultipleSourceInventoryEnabled($scopeType = ScopeInterface::SCOPE_STORE)
+    public function isMultipleSourceInventoryEnabled($scopeType = ScopeInterface::SCOPE_STORE, $scopeCode = null)
     {
-        return $this->isEnabled($scopeType) && $this->scopeConfig->isSetFlag(
+        return $this->isEnabled($scopeType, $scopeCode) && $this->scopeConfig->isSetFlag(
                 self::MULTIPLE_SOURCE_INVENTORY_ENABLED,
-                $scopeType
+                $scopeType,
+                $scopeCode
             );
     }
 
@@ -193,11 +201,12 @@ class Config extends AbstractHelper
      * Get Multiple Source Inventory Source/DC Warehouse mapping in JSON format
      *
      * @param string $scopeType
+     * @param int|null|string $scopeCode
      * @return mixed
      */
-    public function getMsiMappingJson($scopeType = ScopeInterface::SCOPE_STORE)
+    public function getMsiMappingJson($scopeType = ScopeInterface::SCOPE_STORE, $scopeCode = null)
     {
-        return $this->getConfigValue(self::MULTIPLE_SOURCE_INVENTORY_MAPPING, $scopeType);
+        return $this->getConfigValue(self::MULTIPLE_SOURCE_INVENTORY_MAPPING, $scopeType, $scopeCode);
     }
 
     /**
@@ -304,11 +313,12 @@ class Config extends AbstractHelper
      * Get order export API key setting
      *
      * @param string $scopeType
+     * @param int|null|string $scopeCode
      * @return mixed
      */
-    public function getOrderExportApiName($scopeType = ScopeInterface::SCOPE_STORE)
+    public function getOrderExportApiName($scopeType = ScopeInterface::SCOPE_STORE, $scopeCode = null)
     {
-        return $this->getConfigValue(self::ORDER_API_NAME, $scopeType);
+        return $this->getConfigValue(self::ORDER_API_NAME, $scopeType, $scopeCode);
     }
 
     /**
@@ -318,12 +328,13 @@ class Config extends AbstractHelper
      * If this config is also empty then GROUND method will be used by default
      *
      * @param string $scopeType
+     * @param int|null|string $scopeCode
      * @return mixed
      */
-    public function getDefaultShippingMethod($scopeType = ScopeInterface::SCOPE_STORE)
+    public function getDefaultShippingMethod($scopeType = ScopeInterface::SCOPE_STORE, $scopeCode = null)
     {
         return
-            $this->getConfigValue(self::ORDER_DEFAULT_METHOD, $scopeType)
+            $this->getConfigValue(self::ORDER_DEFAULT_METHOD, $scopeType, $scopeCode)
             ?: self::DEFAULT_DECK_SHIPPING_METHOD;
     }
 
@@ -331,36 +342,37 @@ class Config extends AbstractHelper
      * Get product attribute code for UPC(GTIN) value
      *
      * @param string $scopeType
+     * @param int|null|string $scopeCode
      * @return string
      */
-    public function getOrderItemUpcAttribute($scopeType = ScopeInterface::SCOPE_STORE)
+    public function getOrderItemUpcAttribute($scopeType = ScopeInterface::SCOPE_STORE, $scopeCode = null)
     {
-        return $this->getConfigValue(self::ORDER_UPC_ATTRIBUTE_CODE, $scopeType);
+        return $this->getConfigValue(self::ORDER_UPC_ATTRIBUTE_CODE, $scopeType, $scopeCode);
     }
 
     /**
-     * Get flag that determines whether need to send order to Deck Commerce on place order action
+     * Get flag that determines whether we need to send order to Deck Commerce on place order action
      *
      * @param string $scopeType
+     * @param int|null|string $scopeCode
      * @return string
      */
-    public function getOrderSendImmediately($scopeType = ScopeInterface::SCOPE_STORE)
+    public function getOrderSendImmediately($scopeType = ScopeInterface::SCOPE_STORE, $scopeCode = null)
     {
-        return $this->isOrderExportEnabled($scopeType) && $this->scopeConfig->isSetFlag(
-            self::ORDER_SEND_IMMEDIATELY,
-            $scopeType
-        );
+        return $this->isOrderExportEnabled($scopeType, $scopeCode)
+            && $this->scopeConfig->isSetFlag(self::ORDER_SEND_IMMEDIATELY, $scopeType, $scopeCode);
     }
 
     /**
      * Get order states list that used to exclude the order with such state from the export
      *
      * @param string $scopeType
+     * @param int|null|string $scopeCode
      * @return array
      */
-    public function getExcludedOrderStates($scopeType = ScopeInterface::SCOPE_STORE)
+    public function getExcludedOrderStates($scopeType = ScopeInterface::SCOPE_STORE, $scopeCode = null)
     {
-        $excludedStates = $this->getConfigValue(self::ORDER_EXCLUDED_STATES, $scopeType);
+        $excludedStates = $this->getConfigValue(self::ORDER_EXCLUDED_STATES, $scopeType, $scopeCode);
         if ($excludedStates) {
             return explode(',', $excludedStates);
         }
@@ -369,69 +381,100 @@ class Config extends AbstractHelper
     }
 
     /**
+     * Is custom shipping methods mapping enabled
+     *
+     * @param string $scopeType
+     * @param int|null|string $scopeCode
+     * @return bool
+     */
+    public function isShippingMethodsMappingEnabled($scopeType = ScopeInterface::SCOPE_STORE, $scopeCode = null)
+    {
+        return $this->scopeConfig->isSetFlag(self::ORDER_USE_SHIPPING_METHODS_MAPPING, $scopeType, $scopeCode);
+    }
+
+    /**
+     * Get Magento /Deck Commerce shipping methods mapping in JSON format
+     *
+     * @param string $scopeType
+     * @param int|null|string $scopeCode
+     * @return mixed
+     */
+    public function getShippingMethodsMappingJson($scopeType = ScopeInterface::SCOPE_STORE, $scopeCode = null)
+    {
+        if (!$this->isShippingMethodsMappingEnabled($scopeType, $scopeCode)) {
+            return '';
+        }
+
+        return $this->getConfigValue(self::ORDER_SHIPPING_METHODS_MAPPING, $scopeType, $scopeCode);
+    }
+
+    /**
      * Setting that determines if need to use payment methods mapping
      *
      * @param string $scopeType
+     * @param int|null|string $scopeCode
      * @return bool
      */
-    public function usePaymentMethodsMappingJson($scopeType = ScopeInterface::SCOPE_STORE)
+    public function usePaymentMethodsMappingJson($scopeType = ScopeInterface::SCOPE_STORE, $scopeCode = null)
     {
-        return $this->scopeConfig->isSetFlag(self::ORDER_USE_PAYMENT_METHODS_MAPPING, $scopeType);
+        return $this->scopeConfig->isSetFlag(self::ORDER_USE_PAYMENT_METHODS_MAPPING, $scopeType, $scopeCode);
     }
 
     /**
      * Get order payment methods mapping json
      *
      * @param string $scopeType
+     * @param int|null|string $scopeCode
      * @return bool
      */
-    public function getPaymentMethodsMappingJson($scopeType = ScopeInterface::SCOPE_STORE)
+    public function getPaymentMethodsMappingJson($scopeType = ScopeInterface::SCOPE_STORE, $scopeCode = null)
     {
-        if (!$this->usePaymentMethodsMappingJson($scopeType)) {
+        if (!$this->usePaymentMethodsMappingJson($scopeType, $scopeCode)) {
             return '';
         }
 
-        return trim($this->getConfigValue(self::ORDER_PAYMENT_METHODS_MAPPING, $scopeType));
+        return trim($this->getConfigValue(self::ORDER_PAYMENT_METHODS_MAPPING, $scopeType, $scopeCode));
     }
 
     /**
      * Setting that determines if need to use Colorado Retail Delivery Tax calculation
      *
      * @param string $scopeType
+     * @param int|null|string $scopeCode
      * @return bool
      */
-    public function useDeliveryTax($scopeType = ScopeInterface::SCOPE_STORE)
+    public function useDeliveryTax($scopeType = ScopeInterface::SCOPE_STORE, $scopeCode = null)
     {
-        return $this->scopeConfig->isSetFlag(self::ORDER_USE_RETAIL_DELIVERY_TAX, $scopeType);
+        return $this->scopeConfig->isSetFlag(self::ORDER_USE_RETAIL_DELIVERY_TAX, $scopeType, $scopeCode);
     }
 
     /**
      * Get Colorado Retail Delivery Tax calculation value (0.27 by default)
      *
      * @param string $scopeType
+     * @param int|null|string $scopeCode
      * @return string
      */
-    public function getDeliveryTaxAmount($scopeType = ScopeInterface::SCOPE_STORE)
+    public function getDeliveryTaxAmount($scopeType = ScopeInterface::SCOPE_STORE, $scopeCode = null)
     {
-        if (!$this->useDeliveryTax($scopeType)) {
+        if (!$this->useDeliveryTax($scopeType, $scopeCode)) {
             return 0;
         }
 
-        return $this->getConfigValue(self::ORDER_RETAIL_DELIVERY_TAX_AMOUNT, $scopeType);
+        return $this->getConfigValue(self::ORDER_RETAIL_DELIVERY_TAX_AMOUNT, $scopeType, $scopeCode);
     }
 
     /**
      * Use debug mode for order export - log all API requests and responses
      *
      * @param string $scopeType
+     * @param int|null|string $scopeCode
      * @return bool
      */
-    public function useOrderExportDebug($scopeType = ScopeInterface::SCOPE_STORE)
+    public function useOrderExportDebug($scopeType = ScopeInterface::SCOPE_STORE, $scopeCode = null)
     {
-        return $this->isOrderExportEnabled($scopeType) && $this->scopeConfig->isSetFlag(
-            self::ORDER_DEBUG,
-            $scopeType
-        );
+        return $this->isOrderExportEnabled($scopeType, $scopeCode)
+            && $this->scopeConfig->isSetFlag(self::ORDER_DEBUG, $scopeType, $scopeCode);
     }
 
     /**

@@ -16,6 +16,7 @@ use Magento\Payment\Model\Method\Free;
 use Magento\Paypal\Model\Config as PaypalConfig;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\Data\OrderPaymentInterface;
+use Magento\Store\Model\ScopeInterface;
 
 /**
  * Order PaymentBuilder model
@@ -183,7 +184,7 @@ class PaymentBuilder
 
         $data["OrderTransactions"] = $this->getOrderTransactions($orderPayment);
 
-        $data = $this->applyPaymentMethodsMapping($orderPayment, $data);
+        $data = $this->applyPaymentMethodsMapping($order, $data);
 
         return $data;
     }
@@ -191,16 +192,20 @@ class PaymentBuilder
     /**
      * Override payment method values by the values specified in the configuration json
      *
-     * @param OrderPaymentInterface $orderPayment
+     * @param OrderInterface $order
      * @param array $defaultMappingData
      * @return array
      */
-    protected function applyPaymentMethodsMapping($orderPayment, $defaultMappingData)
+    protected function applyPaymentMethodsMapping($order, $defaultMappingData)
     {
-        $paymentMethodsMapping = $this->helper->getPaymentMethodsMapping();
+        $orderPayment = $order->getPayment();
+        $paymentMethodsMapping = $this->helper
+            ->getPaymentMethodsMapping(ScopeInterface::SCOPE_STORE, $order->getStoreId());
+
         if ($paymentMethodsMapping && isset($paymentMethodsMapping[$orderPayment->getMethod()])) {
             $paymentMethodsMappingFields = $paymentMethodsMapping[$orderPayment->getMethod()];
-            $defaultMappingData = $this->processMappingFields($defaultMappingData, $paymentMethodsMappingFields, $orderPayment);
+            $defaultMappingData = $this
+                ->processMappingFields($defaultMappingData, $paymentMethodsMappingFields, $orderPayment);
         }
 
         return $defaultMappingData;
@@ -255,7 +260,7 @@ class PaymentBuilder
                 continue;
             }
 
-            $configValue = $this->processConfigField($mappingFieldValue);
+            $configValue = $this->processConfigField($mappingFieldValue, $order->getStoreId());
             if (!is_null($configValue)) {
                 $defaultMappingData[$mappingFieldName] = $configValue;
                 continue;
@@ -306,13 +311,14 @@ class PaymentBuilder
      * Method replaces values like "config:general/store_information/name" with the actual values of system configuration by path
      *
      * @param string $mappingFieldValue
+     * @param int $storeId
      * @return string | null
      */
-    protected function processConfigField($mappingFieldValue)
+    protected function processConfigField($mappingFieldValue, $storeId)
     {
         if (strpos($mappingFieldValue, self::MAPPING_CONFIG_FIELD_PREFIX) !== false) {
             $configPath = str_replace(self::MAPPING_CONFIG_FIELD_PREFIX, '', $mappingFieldValue);
-            return (string) $this->helper->getConfigValue($configPath);
+            return (string) $this->helper->getConfigValue($configPath, ScopeInterface::SCOPE_STORE, $storeId);
         }
 
         return null;
