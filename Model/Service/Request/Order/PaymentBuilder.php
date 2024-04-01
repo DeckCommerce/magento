@@ -128,12 +128,12 @@ class PaymentBuilder
             $data[] = $this->getMainOrderPayment($order);
         }
 
-        $storeCreditPaymentData = $this->getStoreCreditPayment($order->getBaseCustomerBalanceAmount());
+        $storeCreditPaymentData = $this->getStoreCreditPayment($order->getCustomerBalanceAmount());
         if (!empty($storeCreditPaymentData)) {
             $data[] = $storeCreditPaymentData;
         }
 
-        $rewardPointsPaymentData = $this->getRewardPointsPayment($order->getBaseRewardCurrencyAmount());
+        $rewardPointsPaymentData = $this->getRewardPointsPayment($order->getRewardCurrencyAmount());
         if (!empty($rewardPointsPaymentData)) {
             $data[] = $rewardPointsPaymentData;
         }
@@ -174,8 +174,8 @@ class PaymentBuilder
             $data["Generic1"]      = $this->getVerifoneToken($orderPayment);
             $data["Generic2"]      = $this->getPaymentMethod($orderPayment);
             $data["Generic3"]      = $this->getExprDate($orderPayment);
-            $data["CapturedAmount"] = $this->helper->formatPrice($order->getBaseGrandTotal());
-            $data["CreditedAmount"] = $this->helper->formatPrice($order->getBaseGrandTotal());
+            $data["CapturedAmount"] = $this->helper->formatPrice($order->getGrandTotal());
+            $data["CreditedAmount"] = $this->helper->formatPrice($order->getGrandTotal());
         } else {
             $data["PaymentToken"] = $this->getPaymentToken($orderPayment);
             $data["Generic2"]     = $this->getCcLast4($orderPayment);

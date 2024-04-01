@@ -179,8 +179,8 @@ class OrderBuilder implements OrderBuilderInterface
     protected function getOrderGrossTotal(OrderInterface $order)
     {
         return $this->helper->formatPrice($order->getGrandTotal())
-            + $this->helper->formatPrice($order->getBaseCustomerBalanceAmount())
-            + $this->helper->formatPrice($order->getBaseRewardCurrencyAmount());
+            + $this->helper->formatPrice($order->getCustomerBalanceAmount())
+            + $this->helper->formatPrice($order->getRewardCurrencyAmount());
     }
 
     /**

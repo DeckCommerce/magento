@@ -52,8 +52,8 @@ class RulesApplierPlugin
         foreach ($discounts as $discount) {
             $discountData = $discount->getDiscountData();
             $rulesData[$discount->getRuleId()] = [
-                'label'       => $discount->getRuleLabel(),
-                'base_amount' => $discountData->getBaseAmount()
+                'label'  => $discount->getRuleLabel(),
+                'amount' => $discountData->getAmount()
             ];
         }
 

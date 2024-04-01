@@ -397,7 +397,7 @@ class ItemBuilder
     protected function getOrderItemTaxes(Item $orderItem)
     {
         $taxAmount = $this->deltaRound(
-            $orderItem->getBaseTaxAmount(),
+            $orderItem->getTaxAmount(),
             (int) $orderItem->getQtyOrdered(),
             $orderItem->getItemId(),
             self::TAX_TYPE,
@@ -422,7 +422,7 @@ class ItemBuilder
     protected function getItemAdjustments(Item $orderItem)
     {
         $itemAdjustments = [];
-        if ($orderItem->getAppliedRuleIds()) {
+        if ($orderItem->getDiscountAmount() > 0 && $orderItem->getAppliedRuleIds()) {
             $ruleIds = array_unique(explode(',', $orderItem->getAppliedRuleIds()));
             foreach ($ruleIds as $ruleId) {
                 $ruleDiscount = $this->getDiscountItemAdjustment($ruleId, $orderItem);
@@ -448,8 +448,8 @@ class ItemBuilder
         $additionalData = $this->helper->jsonDecode($additionalData) ?: [];
         $additionalData = $additionalData['discounts'][$ruleId] ?? [];
 
-        if (!empty($additionalData) || $orderItem->getBaseDiscountAmount() > 0) {
-            $discountAmount = $additionalData['base_amount'] ?? 0;
+        if (!empty($additionalData)) {
+            $discountAmount = $additionalData['amount'] ?? $additionalData['base_amount'] ?? 0;
             if ($discountAmount > 0) {
                 $netPrice = $this->deltaRound(
                     $discountAmount,

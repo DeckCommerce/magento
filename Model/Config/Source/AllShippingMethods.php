@@ -22,6 +22,9 @@ class AllShippingMethods extends \Magento\Shipping\Model\Config\Source\Allmethod
      */
     protected $orderCollectionFactory;
 
+    /**
+     * @var null | array
+     */
     protected $customMethods = null;
 
     /**
