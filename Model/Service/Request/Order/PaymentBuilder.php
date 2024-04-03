@@ -138,6 +138,11 @@ class PaymentBuilder
             $data[] = $rewardPointsPaymentData;
         }
 
+        $giftCardsPaymentData = $this->getGiftCardsPayment($order->getGiftCardsAmount());
+        if (!empty($giftCardsPaymentData)) {
+            $data[] = $giftCardsPaymentData;
+        }
+
         return $data;
     }
 
@@ -167,6 +172,7 @@ class PaymentBuilder
             $data["CreditCard"]   = null;
             $data["Generic2"]     = '';
             $data["Generic3"]     = '';
+            $data["EarlyCapture"] = true;
         } elseif ($orderPayment->getMethod() == 'verifone' || $orderPayment->getMethod() == 'verifone_hosted') {
             $data["PaymentToken"]  = (string) $order->getData('ext_order_id');
             $data["CreditCard"]    = $this->getCcLast4($orderPayment);
@@ -349,22 +355,20 @@ class PaymentBuilder
      */
     protected function getStoreCreditPayment($customerBalanceAmount)
     {
-        if (!$customerBalanceAmount) {
-            return [];
-        }
+        return $this
+            ->getVirtualBalancePayment($customerBalanceAmount, self::PAYMENT_PROCESSOR_STORE_CREDIT);
+    }
 
-        $data = [
-            "PaymentProcessorSubTypeID"   => 0,
-            "PaymentProcessorSubTypeName" => self::PAYMENT_PROCESSOR_STORE_CREDIT,
-            "AuthorizedAmount"            => $this->helper->formatPrice($customerBalanceAmount),
-            "OrderTransactions"           => [
-                [
-                  "TransactionAmount"        => $this->helper->formatPrice($customerBalanceAmount)
-                ]
-            ]
-        ];
-
-        return $data;
+    /**
+     * Get Gift Cards payment data
+     *
+     * @param null|float $giftCardsAmount
+     * @return array
+     */
+    protected function getGiftCardsPayment($giftCardsAmount)
+    {
+        return $this
+            ->getVirtualBalancePayment($giftCardsAmount, self::PAYMENT_PROCESSOR_STORE_CREDIT);
     }
 
     /**
@@ -375,17 +379,30 @@ class PaymentBuilder
      */
     protected function getRewardPointsPayment($rewardPointsAmount)
     {
-        if (!$rewardPointsAmount) {
+        return $this
+            ->getVirtualBalancePayment($rewardPointsAmount, self::PAYMENT_PROCESSOR_REWARD_POINTS);
+    }
+
+    /**
+     * Get amounts for cases with virtual balance such as Reward Points, Customer Balance, GiftCards
+     *
+     * @param null|float $amount
+     * @param string $paymentTypeName
+     * @return array
+     */
+    private function getVirtualBalancePayment($amount, $paymentTypeName)
+    {
+        if (!$amount || $amount < 0.01) {
             return [];
         }
 
         $data = [
             "PaymentProcessorSubTypeID"   => 0,
-            "PaymentProcessorSubTypeName" => self::PAYMENT_PROCESSOR_REWARD_POINTS,
-            "AuthorizedAmount"            => $this->helper->formatPrice($rewardPointsAmount),
+            "PaymentProcessorSubTypeName" => $paymentTypeName,
+            "AuthorizedAmount"            => $this->helper->formatPrice($amount),
             "OrderTransactions"           => [
                 [
-                    "TransactionAmount"        => $this->helper->formatPrice($rewardPointsAmount)
+                    "TransactionAmount"        => $this->helper->formatPrice($amount)
                 ]
             ]
         ];

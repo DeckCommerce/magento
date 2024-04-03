@@ -180,7 +180,8 @@ class OrderBuilder implements OrderBuilderInterface
     {
         return $this->helper->formatPrice($order->getGrandTotal())
             + $this->helper->formatPrice($order->getCustomerBalanceAmount())
-            + $this->helper->formatPrice($order->getRewardCurrencyAmount());
+            + $this->helper->formatPrice($order->getRewardCurrencyAmount())
+            + $this->helper->formatPrice($order->getGiftCardsAmount());
     }
 
     /**
