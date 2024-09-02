@@ -41,7 +41,7 @@ It has the following features:
 
 
 ## Requirements
-  * Magento Enterprise (or Cloud) Edition 2.4.x-2.6.x
+  * Magento Enterprise (or Cloud) Edition 2.4.4-2.4.7
 
 ## Configuration in Admin Panel
 

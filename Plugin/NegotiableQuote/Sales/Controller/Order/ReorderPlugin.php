@@ -170,6 +170,14 @@ class ReorderPlugin
             $order = $this->salesOrderFactory->create()->loadByIncrementId($orderId);
         }
 
+        if (!$order->getId()) {
+            /** @var \Magento\Framework\Controller\Result\Redirect $resultRedirect */
+            $resultRedirect = $this->resultFactory->create(ResultFactory::TYPE_REDIRECT);
+            $this->messageManager->addErrorMessage(__('The order cannot be reordered.'));
+
+            return $resultRedirect->setRefererUrl();
+        }
+
         $this->addItemsToCart($this->cart, $order->getItemsCollection(), (string)$order->getStoreId());
         $this->cart->save();
 
@@ -182,12 +190,16 @@ class ReorderPlugin
             );
         }
 
-        $this->orderAddressToQuoteAddress(
-            $this->cart->getQuote()->getBillingAddress(),
-            $order->getBillingAddress()
-        );
+        if ($order->getBillingAddress()) {
+            $this->orderAddressToQuoteAddress(
+                $this->cart->getQuote()->getBillingAddress(),
+                $order->getBillingAddress()
+            );
+        }
 
-        $this->cart->getQuote()->getPayment()->setMethod($order->getPayment()->getMethod())->save();
+        if ($order->getPayment() && $order->getPayment()->getMethod()) {
+            $this->cart->getQuote()->getPayment()->setMethod($order->getPayment()->getMethod())->save();
+        }
 
         /** @var \Magento\Framework\Controller\Result\Redirect $resultRedirect */
         $resultRedirect = $this->resultFactory->create(ResultFactory::TYPE_REDIRECT);

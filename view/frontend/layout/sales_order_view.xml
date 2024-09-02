@@ -21,5 +21,6 @@
                 </block>
             </block>
         </referenceBlock>
+        <referenceBlock name="sales.order.info.buttons" template="Magento_Sales::order/info/buttons.phtml"/>
     </body>
 </page>
